@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/png" href="/assets/logo.png" />
+    <title>Les Toqués du Cœur – La cuisine au service de la solidarité</title>
+    <meta name="description" content="Association 100 % bénévole à Harnes et à Masny : marché solidaire et paniers à 5 € réservés aux adhérents, moments de partage pour les enfants malades, handicapés ou en situation de précarité et leurs familles." />
+    <meta name="theme-color" content="#fff6d2" />
+    <meta property="og:title" content="Les Toqués du Cœur" />
+    <meta property="og:description" content="La cuisine au service de la solidarité, à Harnes et à Masny." />
+    <meta property="og:image" content="/assets/couverture.jpg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zilla+Slab:wght@500;700&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=DM+Mono:wght@400;500&display=swap" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- Formulaire statique détecté par Netlify Forms au build ; le formulaire React envoie vers lui. -->
+    <form name="adhesion" netlify netlify-honeypot="bot-field" hidden>
+      <input type="text" name="prenom" />
+      <input type="text" name="nom" />
+      <input type="email" name="email" />
+      <input type="tel" name="telephone" />
+      <input type="text" name="ville" />
+      <input type="text" name="souhait" />
+      <textarea name="message"></textarea>
+      <input type="text" name="bot-field" />
+    </form>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
