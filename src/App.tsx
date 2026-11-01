@@ -7,16 +7,17 @@ const TEL = '06 45 84 22 15'
 const ADHESION = 15
 const PANIER = 5
 
-// Photos d'illustration provisoires (Unsplash) — à remplacer par celles de l'association.
-const u = (id: string, w = 1800) => `https://images.unsplash.com/photo-${id}?w=${w}&q=80&auto=format&fit=crop`
+// Photos de l'association (page Facebook), servies depuis public/assets.
 const PHOTOS = {
-  hero: u('1488459716781-31db52582fe9', 2200),
-  etal: u('1542838132-92c53300491e', 1400),
-  benevoles: u('1593113598332-cd288d649433', 1400),
-  partage: u('1532629345422-7515f3d16bb6', 1400),
-  table: u('1498837167922-ddd27525d352', 1400),
-  cuisine: u('1556910103-1c02745aae4d', 2200),
-  brunch: u('1504754524776-8f4f37790ca0', 2200),
+  hero: '/assets/hero.jpg',
+  paniers: '/assets/paniers.jpg',
+  cuisine: '/assets/cuisine.jpg',
+  distribution: '/assets/distribution.jpg',
+  marche: '/assets/marche.jpg',
+  partage: '/assets/partage.jpg',
+  repas: '/assets/repas.jpg',
+  equipe: '/assets/equipe.jpg',
+  don: '/assets/don.jpg',
 }
 
 const d = (ms: number) => ({ '--d': `${ms}ms` }) as CSSProperties
@@ -155,7 +156,7 @@ function Paniers() {
     <section className="section" id="paniers">
       <div className="wrap split">
         <figure className="photo" data-reveal>
-          <img src={PHOTOS.etal} alt="Un étal de fruits et légumes frais" loading="lazy" />
+          <img src={PHOTOS.paniers} alt="Des cagettes de fruits et légumes prêtes pour la distribution" loading="lazy" />
           <figcaption className="sticker"><b>{PANIER} €</b><small>le panier</small></figcaption>
         </figure>
         <div className="copy" data-reveal data-from="right">
@@ -193,10 +194,10 @@ function Band({ photo, children, id }: { photo: string; children: ReactNode; id?
 
 function Actions() {
   const items = [
-    [PHOTOS.benevoles, 'Distributions de paniers', `Un samedi matin par ville : chaque famille inscrite repart avec sa cagette à ${PANIER} €, remise par les bénévoles.`, 'Harnes · Masny'],
-    [PHOTOS.etal, 'Marché solidaire', 'Un étal de produits frais à prix solidaire pour les adhérents, avec un café et le temps de discuter.', 'Régulier'],
+    [PHOTOS.distribution, 'Distributions de paniers', `Un samedi matin par ville : chaque famille inscrite repart avec sa cagette à ${PANIER} €, remise par les bénévoles.`, 'Harnes · Masny'],
+    [PHOTOS.marche, 'Marché solidaire', 'Un étal de produits frais à prix solidaire pour les adhérents, avec un café et le temps de discuter.', 'Régulier'],
     [PHOTOS.partage, 'Moments de partage', 'Goûters, sorties, ateliers cuisine : des moments de bonheur pour les enfants et leurs parents.', "Toute l'année"],
-    [PHOTOS.table, 'Repas & collectes', 'On cuisine, on collecte dons et denrées auprès des commerçants et partenaires, on redistribue.', 'Selon les besoins'],
+    [PHOTOS.repas, 'Repas & collectes', 'On cuisine, on collecte dons et denrées auprès des commerçants et partenaires, on redistribue.', 'Selon les besoins'],
   ]
   return (
     <section className="section" id="actions">
@@ -273,7 +274,7 @@ function Asso() {
             </ul>
           </div>
           <figure className="photo tilt" data-reveal data-from="right">
-            <img src="/assets/couverture.jpg" alt="La cuisine au service de la solidarité" loading="lazy" />
+            <img src={PHOTOS.equipe} alt="L'équipe des Toqués du Cœur réunie sous la tente" loading="lazy" />
           </figure>
         </div>
       </div>
@@ -426,7 +427,7 @@ function Footer() {
       </div>
       <div className="wrap legal">
         <span>© {new Date().getFullYear()} Les Toqués du Cœur · Harnes &amp; Masny</span>
-        <span>Photos d'illustration : Unsplash</span>
+        <span>Photos : Les Toqués du Cœur</span>
       </div>
     </footer>
   )
@@ -451,7 +452,7 @@ export default function App() {
         </Band>
         <Actions />
         <Asso />
-        <Band photo={PHOTOS.brunch}>
+        <Band photo={PHOTOS.don}>
           <div className="band-cta" data-reveal>
             <h2>Un don, et la cagette se remplit.</h2>
             <p>30 € donnés ne vous coûtent que 10,20 € après réduction d'impôt.</p>
