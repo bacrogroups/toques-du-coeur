@@ -44,7 +44,7 @@ function Hero() {
           <p className="partners">Avec la Ville de Harnes, Habitat Solidaire et Masny Info.</p>
         </div>
         <div className="hero-art">
-          <div className="hero-photo"><img src="/assets/equipe.jpg" alt="L'équipe de bénévoles réunie devant une tente" /></div>
+          <div className="hero-photo"><img src="/assets/paniers.jpg" alt="Des barquettes de tomates et des cagettes prêtes pour la distribution" /></div>
           <span className="badge one"><span><b>{PANIER} €</b>le panier</span></span>
           <span className="badge two"><span><b>2</b>villes</span></span>
         </div>
