@@ -73,10 +73,11 @@ function Panier() {
         </div>
         <div className="center" ref={ref}><BasketScene /></div>
         <div className="right">
+          <p className="list-title">Exemple de panier</p>
           <ul className="fill-list">
             {rows.map(([r, label]) => <li key={label} data-range={r}><i className="tick"><span>✓</span></i>{label}</li>)}
           </ul>
-          <p className="body final" data-range=".78,.9">Réservé aux adhérents, préparé par les bénévoles, à retirer de 10 h à midi lors des distributions.</p>
+          <p className="body final" data-range=".78,.9"><strong>Le contenu change à chaque fois, selon les arrivages.</strong> Réservé aux adhérents, préparé par les bénévoles, à retirer de 10 h à midi lors des distributions.</p>
         </div>
       </div>
     </section>
@@ -273,7 +274,7 @@ function Footer() {
         <div><b>Nous suivre</b><p><a href={FACEBOOK} target="_blank" rel="noopener">Facebook</a></p></div>
       </div>
       <p className="mega" data-reveal>Les Toqués du Cœur</p>
-      <p className="credit">© {new Date().getFullYear()} Association loi 1901 d'intérêt général · Photos : Les Toqués du Cœur</p>
+      <p className="credit">© {new Date().getFullYear()} Association loi 1901 d'intérêt général · Photos : Les Toqués du Cœur · Site créé par Studio Instinct</p>
     </footer>
   )
 }
