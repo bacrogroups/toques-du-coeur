@@ -227,15 +227,16 @@ export function BasketScene() {
         {rimBraid(0, Math.PI, 26)}
       </g>
 
-      {/* Étiquette accrochée à l'anse */}
-      <g data-range=".72,.82" className="swing" style={{ transformOrigin: '150px 150px' } as CSSProperties}>
-        <g className="sway" style={{ '--o': '150px 150px' } as CSSProperties}>
-          <path d="M150 150C146 170 154 182 150 204" fill="none" stroke={ROSE} strokeWidth="3.5" />
-          <circle cx="150" cy="284" r="84" fill={ROSE} />
-          <circle cx="150" cy="284" r="72" fill="none" stroke="#fff" strokeWidth="2" strokeDasharray="5 6" />
-          <circle cx="150" cy="218" r="7" fill="#fff" />
-          <text x="150" y="298" textAnchor="middle" fontFamily="Fraunces, Georgia, serif" fontSize="58" fontWeight="600" fill="#fff">5 €</text>
-          <text x="150" y="326" textAnchor="middle" fontSize="17" fontWeight="800" fill="#fff">le panier</text>
+      {/* Étiquette suspendue au bord du panier */}
+      <g transform="translate(30 192)">
+        <g data-range=".72,.82" className="swing" style={{ transformOrigin: '150px 198px' } as CSSProperties}>
+          <g className="sway" style={{ '--o': '150px 198px' } as CSSProperties}>
+            <path d="M150 196v20" fill="none" stroke={ROSE} strokeWidth="4" strokeLinecap="round" />
+            <circle cx="150" cy="284" r="72" fill={ROSE} />
+            <circle cx="150" cy="284" r="61" fill="none" stroke="#fff" strokeWidth="2" strokeDasharray="5 6" />
+            <text x="150" y="298" textAnchor="middle" fontFamily="Fraunces, Georgia, serif" fontSize="50" fontWeight="600" fill="#fff">5 €</text>
+            <text x="150" y="322" textAnchor="middle" fontSize="15" fontWeight="800" fill="#fff">le panier</text>
+          </g>
         </g>
       </g>
 
@@ -289,7 +290,7 @@ function Face({ r, skin, hair, children }: { r: number; skin: string; hair: Reac
 /* Bénévole en toque, derrière l'étal */
 function Volunteer({ x, range, skin, apron }: { x: number; range: string; skin: string; apron: string }) {
   return (
-    <g transform={`translate(${x} 322)`}>
+    <g transform={`translate(${x} 276)`}>
       <g data-range={range} className="fade-up">
         <path d="M-58 130V62q0-42 58-42t58 42v68Z" fill="#fff" stroke="#eadfce" strokeWidth="2" />
         <path d="M-32 130V54q32 14 64 0v76Z" fill={apron} />
@@ -406,6 +407,15 @@ export function MarketScene() {
       <rect data-range=".05,.13" className="rise" x="196" y="110" width="16" height="470" rx="6" fill="url(#gWood)" />
       <rect data-range=".07,.15" className="rise" x="748" y="110" width="16" height="470" rx="6" fill="url(#gWood)" />
 
+      {/* Guirlande d'ampoules */}
+      <g data-range=".66,.74" className="fade">
+        <path d="M212 262Q480 310 748 262" fill="none" stroke="#8a7a6d" strokeWidth="2" />
+        {bulbs.map((i) => {
+          const t = (i + 1) / 8
+          return <circle key={i} className="bulb" style={{ animationDelay: `${i * .27}s` }} cx={212 + 536 * t} cy={262 + 96 * t * (1 - t) + 9} r="8" fill="#ffc83d" stroke="#fff" />
+        })}
+      </g>
+
       {/* Bénévoles derrière l'étal */}
       <Volunteer x={344} range=".58,.65" skin="#f1c5a3" apron={ROSE} />
       <Volunteer x={612} range=".61,.68" skin="#8d5a3c" apron="#2f8f5b" />
@@ -452,15 +462,6 @@ export function MarketScene() {
         />
       ))}
       <g data-range=".22,.3" className="fade"><rect x="192" y="88" width="576" height="12" rx="6" fill="url(#gWood)" /></g>
-
-      {/* Guirlande d'ampoules */}
-      <g data-range=".66,.74" className="fade">
-        <path d="M212 262Q480 310 748 262" fill="none" stroke="#8a7a6d" strokeWidth="2" />
-        {bulbs.map((i) => {
-          const t = (i + 1) / 8
-          return <circle key={i} className="bulb" style={{ animationDelay: `${i * .27}s` }} cx={212 + 536 * t} cy={262 + 96 * t * (1 - t) + 9} r="8" fill="#ffc83d" stroke="#fff" />
-        })}
-      </g>
 
       {/* Enseigne */}
       <g data-range=".6,.68" className="swing" style={{ transformOrigin: '480px 20px' } as CSSProperties}>
