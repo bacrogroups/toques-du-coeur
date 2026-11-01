@@ -135,8 +135,6 @@ function Actions() {
     ['/assets/distribution.jpg', 'Distributions', `Chaque famille inscrite repart avec son panier à ${PANIER} €, remis par les bénévoles.`, 'Harnes · Masny'],
     ['/assets/marche.jpg', 'Marché solidaire', 'Des cagettes de produits frais, à prix solidaire, pour les adhérents.', 'Adhérents'],
     ['/assets/cuisine.jpg', 'Cuisine', 'La soupe maison mijote avant le départ : on cuisine pour celles et ceux qui viennent.', 'Fait maison'],
-    ['/assets/partage.jpg', 'Moments de partage', 'Goûters, sorties, ateliers : du bonheur pour les enfants et leurs parents.', "Toute l'année"],
-    ['/assets/don.jpg', 'Soutien aux familles', 'Du matériel pour les tout-petits remis aux familles qui en ont besoin.', 'Solidarité'],
   ]
   return (
     <section className="hscroll" id="actions" data-pin data-hscroll>
