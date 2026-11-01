@@ -69,7 +69,7 @@ export function BasketScene() {
         <text x="150" y="276" textAnchor="middle" fontSize="50" fontWeight="500" fill={WALNUT}>5 €</text>
         <text x="150" y="304" textAnchor="middle" fontSize="13" fontWeight="500" fill={WALNUT}>LE PANIER</text>
       </g>
-      <g transform="translate(470 96)"><g data-range=".84,.94" className="pop">
+      <g transform="translate(528 120)"><g data-range=".84,.94" className="pop">
         <path className="beat" d="M0 24C-44-8-30-46-8-42-2-41 0-34 0-34S2-41 8-42C30-46 44-8 0 24Z" fill={EMBER} />
       </g></g>
     </svg>
@@ -96,7 +96,7 @@ function Person({ range, side, x, tone }: { range: string; side: 'l' | 'r'; x: n
       <g data-range={range} className={'walk-' + side}>
         <circle cy="-104" r="30" fill={CREAM} />
         <path d="M-44 90v-120q0-44 44-44t44 44V90Z" fill={tone} stroke={CREAM} strokeOpacity=".4" strokeWidth="2" />
-        <path d="M-40 88v104M40 88v104" stroke={tone} strokeWidth="28" strokeLinecap="round" />
+        <path d="M-20 88v104M20 88v104" stroke={tone} strokeWidth="26" strokeLinecap="round" />
       </g>
     </g>
   )
