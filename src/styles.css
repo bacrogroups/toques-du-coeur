@@ -148,7 +148,7 @@ h1 em::after{content:"";position:absolute;left:0;right:0;bottom:.02em;height:.1e
 .words span{opacity:calc(.16 + var(--t,0)*.84)}
 
 /* Actions : défilement horizontal */
-.hscroll{height:300vh}
+.hscroll{height:380vh}
 .track{display:flex;gap:28px;height:100%;width:max-content;align-items:stretch;padding:104px var(--gutter) 40px;will-change:transform}
 .panel{flex:none}
 .panel.intro{width:min(520px,84vw);display:grid;gap:20px;align-content:center;justify-items:start}

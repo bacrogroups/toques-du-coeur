@@ -19,9 +19,8 @@ export function SharedDefs() {
         <radialGradient id="gLeaf" cx=".4" cy=".3" r=".9">{stop(0, '#b7dd7a')}{stop(.6, '#6fb04a')}{stop(1, '#3d8a3f')}</radialGradient>
         <radialGradient id="gLeaf2" cx=".5" cy=".3" r=".9">{stop(0, '#a3d36b')}{stop(1, '#2f8f5b')}</radialGradient>
         <radialGradient id="gFloret" cx=".4" cy=".3" r=".8">{stop(0, '#fffdf3')}{stop(1, '#ecdcae')}</radialGradient>
-        <linearGradient id="gBread" x1="0" x2="1">{stop(0, '#f0c27a')}{stop(.5, '#d9963f')}{stop(1, '#b06f24')}</linearGradient>
+        <radialGradient id="gPotato" cx=".35" cy=".3" r=".85">{stop(0, '#f3d9a4')}{stop(.6, '#d8ae68')}{stop(1, '#a97a38')}</radialGradient>
         <linearGradient id="gGlass" x1="0" x2="1">{stop(0, '#e9eef0')}{stop(.3, '#ffffff')}{stop(1, '#d6dfe2')}</linearGradient>
-        <linearGradient id="gSoup" x1="0" y1="0" x2="0" y2="1">{stop(0, '#fbd98c')}{stop(1, '#ee9d3d')}</linearGradient>
         <linearGradient id="gWicker" x1="0" y1="0" x2="0" y2="1">{stop(0, '#e9bd82')}{stop(1, '#b67c3f')}</linearGradient>
         <linearGradient id="gRim" x1="0" y1="0" x2="0" y2="1">{stop(0, '#f2cd97')}{stop(1, '#c08848')}</linearGradient>
         <linearGradient id="gShade" x1="0" x2="1">
@@ -98,11 +97,18 @@ function Cauliflower({ s = 1 }: { s?: number }) {
     </g>
   )
 }
-function Baguette() {
+function Potatoes() {
+  const spuds: [number, number, number, number, number][] = [[-46, 16, 54, 40, -14], [50, 18, 56, 41, 12], [2, -34, 58, 43, 6], [0, 42, 52, 38, -4]]
   return (
     <g>
-      <rect x="-31" y="-150" width="62" height="300" rx="31" fill="url(#gBread)" />
-      {[-104, -48, 8, 64].map((y) => <path key={y} d={`M-13 ${y + 22}q14-26 26-44`} fill="none" stroke="#fbe6bd" strokeWidth="8" strokeLinecap="round" />)}
+      {spuds.map(([x, y, rx, ry, a], i) => (
+        <g key={i} transform={`translate(${x} ${y}) rotate(${a})`}>
+          <ellipse rx={rx} ry={ry} fill="url(#gPotato)" />
+          <circle cx={-rx * .4} cy={-ry * .25} r="3" fill="#8f6429" opacity=".6" />
+          <circle cx={rx * .3} cy={ry * .2} r="3" fill="#8f6429" opacity=".6" />
+          <circle cx={rx * .1} cy={-ry * .45} r="2.5" fill="#8f6429" opacity=".6" />
+        </g>
+      ))}
     </g>
   )
 }
@@ -117,16 +123,15 @@ function Milk() {
     </g>
   )
 }
-function SoupJar() {
+function Tin() {
   return (
     <g>
-      <path d="M-58-58h116v128q0 18-18 18h-80q-18 0-18-18Z" fill="url(#gSoup)" />
-      <path d="M-44-44v104" stroke="#fff" strokeOpacity=".55" strokeWidth="9" strokeLinecap="round" />
-      <path d="M-66-92h132l6 36q-72 16-144 0Z" fill="url(#gingham)" stroke={ROSE} strokeOpacity=".4" />
-      <path d="M-62-62q62 12 124 0" fill="none" stroke={ROSE} strokeWidth="4" />
-      <rect x="-40" y="-14" width="80" height="48" rx="8" fill="#fff" />
-      <text y="6" textAnchor="middle" fontSize="15" fontWeight="800" fill={INK}>Soupe</text>
-      <text y="24" textAnchor="middle" fontSize="15" fontWeight="800" fill={INK}>maison</text>
+      <rect x="-58" y="-74" width="116" height="160" rx="10" fill="url(#gGlass)" stroke="#c3ced2" strokeWidth="2" />
+      <ellipse cy="-74" rx="58" ry="13" fill="#eef2f3" stroke="#c3ced2" strokeWidth="2" />
+      <ellipse cy="-74" rx="44" ry="8" fill="none" stroke="#c3ced2" strokeWidth="2" />
+      <rect x="-58" y="-40" width="116" height="92" fill={ROSE} />
+      <rect x="-42" y="-24" width="84" height="60" rx="8" fill="#fff" />
+      <text y="11" textAnchor="middle" fontSize="15" fontWeight="800" fill={INK}>Conserve</text>
     </g>
   )
 }
@@ -205,11 +210,11 @@ export function BasketScene() {
       </g>
 
       {/* Produits, de l'arrière vers l'avant */}
-      <Item x={462} y={208} rot={17} range=".1,.2" r={26}><Baguette /></Item>
+      <Item x={478} y={262} range=".1,.2" r={26}><Potatoes /></Item>
       <Item x={214} y={214} rot={-20} range=".18,.28" r={-40}><Carrot /></Item>
       <Item x={166} y={232} rot={-34} range=".2,.3" r={36}><Carrot /></Item>
       <Item x={382} y={218} rot={5} range=".26,.36" r={-24}><Milk /></Item>
-      <Item x={286} y={262} rot={-4} range=".34,.44" r={22}><SoupJar /></Item>
+      <Item x={286} y={262} rot={-4} range=".34,.44" r={22}><Tin /></Item>
       <Item x={160} y={318} rot={-8} range=".42,.52" r={-34}><Lettuce s={1.08} /></Item>
       <Item x={302} y={342} range=".5,.6" r={30}><Cauliflower s={1.02} /></Item>
       <Item x={446} y={336} range=".56,.64" r={-60}><Tomato r={46} /></Item>
