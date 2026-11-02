@@ -14,7 +14,7 @@ const delay = (ms: number) => ({ '--d': `${ms}ms` }) as CSSProperties
 function Nav() {
   return (
     <header className="nav">
-      <a className="brand" href="#top" aria-label="Les Toqués du Cœur – accueil">
+      <a className="brand" href="#top" aria-label="Les Toqués du Cœur, accueil">
         <img src="/assets/logo.png" alt="Les Toqués du Cœur" />
       </a>
       <nav aria-label="Navigation principale">
@@ -32,12 +32,12 @@ function Hero() {
     <section className="hero" id="top" data-pin>
       <div className="stage">
         <div className="hero-copy">
-          <span className="eyebrow">Harnes &amp; Masny · Cuisiner, partager, soutenir</span>
+          <span className="eyebrow">Association à Harnes et à Masny</span>
           <h1>La cuisine au service de la <em>solidarité</em></h1>
           <p className="body">
-            Notre association a pour vocation d'améliorer la qualité de vie des enfants malades, handicapés et
-            en situation de précarité. Des moments de partage et de bonheur pour ces enfants et leurs familles,
-            ainsi qu'une aide concrète pour les adultes qui en ont besoin.
+            Nous voulons rendre la vie plus douce aux enfants malades, handicapés ou en situation de précarité.
+            Nous leur offrons, à eux et à leurs familles, des moments de partage et de bonheur, et nous aidons
+            concrètement les adultes qui en ont besoin.
           </p>
           <div className="row">
             <a className="pill" href="#adhesion">Je deviens adhérent</a>
@@ -71,7 +71,7 @@ function Panier() {
       <div className="stage trio">
         <div className="left">
           <span className="eyebrow">Le panier solidaire</span>
-          <h2>Un panier à {PANIER} €, une aide concrète.</h2>
+          <h2>Un panier de courses pour {PANIER} €.</h2>
         </div>
         <div className="center" ref={ref}><BasketScene /></div>
         <div className="right">
@@ -79,7 +79,7 @@ function Panier() {
           <ul className="fill-list">
             {rows.map(([r, label]) => <li key={label} data-range={r}><i className="tick"><span>✓</span></i>{label}</li>)}
           </ul>
-          <p className="body final" data-range=".78,.9"><strong>Le contenu varie selon les dons et les arrivages.</strong> Un panier par foyer et par semaine, sur réservation, adhérents en priorité. Dates annoncées sur <a href={FACEBOOK} target="_blank" rel="noopener">notre page Facebook</a>.</p>
+          <p className="body final" data-range=".78,.9"><strong>Le contenu change selon les dons et les arrivages.</strong> C'est un panier par foyer et par semaine, sur réservation, et les adhérents passent en priorité. Les dates sont sur <a href={FACEBOOK} target="_blank" rel="noopener">notre page Facebook</a>.</p>
         </div>
       </div>
     </section>
@@ -89,16 +89,16 @@ function Panier() {
 function Marche() {
   const ref = usePointerParallax<HTMLDivElement>()
   const steps: [string, string, string, string][] = [
-    ['0,.38', 'Étape 1', 'Le marché s\'installe', 'Le temps d\'une matinée, on déballe un petit marché solidaire, à côté des paniers.'],
-    ['.34,.68', 'Étape 2', 'Plus de produits', 'Bien plus de choix que dans le panier, selon les dons et les arrivages.'],
-    ['.64,1', 'Étape 3', 'À tout petits prix', 'Chacun choisit ce qu\'il lui faut, à très bas prix, pour compléter son panier.'],
+    ['0,.38', 'Étape 1', 'Le marché s\'installe', "Le temps d'une matinée, nous déballons un petit marché solidaire, en plus des paniers."],
+    ['.34,.68', 'Étape 2', 'Plus de choix', 'On y trouve bien plus de produits que dans le panier, selon les dons et les arrivages.'],
+    ['.64,1', 'Étape 3', 'Des prix très bas', "Chacun prend ce qu'il lui faut pour compléter son panier."],
   ]
   return (
     <section className="pin marche" id="marche" data-pin>
       <div className="stage duo">
         <div className="left">
           <span className="eyebrow green">Le marché solidaire</span>
-          <h2>Plus de produits, à tout petits prix.</h2>
+          <h2>Un marché éphémère, à tout petits prix.</h2>
           <div className="steps">
             {steps.map(([r, n, t, s], i) => (
               <div key={n} className={'step' + (i === steps.length - 1 ? ' hold' : '')} data-range={r}>
@@ -116,7 +116,7 @@ function Marche() {
 }
 
 function Manifeste() {
-  const text = "Derrière chaque panier, il y a de la préparation, de l'entraide et l'envie d'apporter un coup de pouce concret. C'est ça, Les Toqués du Cœur : partager et garder l'humain au centre de nos actions."
+  const text = "Chaque panier se prépare à plusieurs, parce qu'on a envie de donner un vrai coup de pouce. Aux Toqués du Cœur, on partage, et l'humain reste au centre de ce qu'on fait."
   const words = text.split(' ')
   return (
     <section className="pin manifeste" data-pin>
@@ -134,10 +134,10 @@ function Manifeste() {
 
 function Actions() {
   const items: [string, string, string, string][] = [
-    ['/assets/distribution.jpg', 'Paniers solidaires', `Des paniers à ${PANIER} € pour les personnes dans le besoin : familles, personnes seules, étudiants, retraités.`, 'Masny'],
-    ['/assets/marche.jpg', 'Collecte et dons alimentaires', 'Lutter contre le gaspillage et redistribuer : colis pour les tout-petits avec le CCAS de Harnes, Restos du Cœur de Masny.', 'Anti-gaspi'],
-    ['/assets/cuisine.jpg', 'Ateliers cuisine', "Mettre les tabliers et cuisiner ensemble, puis passer à table : Semaine Bleue aux Galibots, Secours populaire de Lille.", 'Partage'],
-    ['/assets/repas.jpg', 'Repas et événements solidaires', 'Dîner de la Saint-Valentin avec le Secours populaire, barbecue des quartiers d\'été, gourmandises pour le Solid\'Events.', 'Convivialité'],
+    ['/assets/distribution.jpg', 'Paniers solidaires', `Des paniers à ${PANIER} € pour les familles, les personnes seules, les étudiants et les retraités qui en ont besoin.`, 'Masny'],
+    ['/assets/marche.jpg', 'Collecte et dons alimentaires', 'Nous collectons des dons pour éviter le gaspillage et nous les redistribuons, par exemple en colis pour les tout-petits avec le CCAS de Harnes, ou avec les Restos du Cœur de Masny.', 'Anti-gaspi'],
+    ['/assets/cuisine.jpg', 'Ateliers cuisine', "On met les tabliers, on cuisine ensemble, puis on passe à table. Nous l'avons fait pour la Semaine Bleue aux Galibots et avec le Secours populaire de Lille.", 'Partage'],
+    ['/assets/repas.jpg', 'Repas et événements solidaires', "Par exemple le dîner de la Saint-Valentin avec le Secours populaire, le barbecue des quartiers d'été ou les gourmandises du Solid'Events.", 'Convivialité'],
   ]
   return (
     <section className="hscroll" id="actions" data-pin data-hscroll>
@@ -145,8 +145,8 @@ function Actions() {
         <div className="track">
           <div className="panel intro">
             <span className="eyebrow sun">Nos actions</span>
-            <h2>Quatre actions, une même volonté.</h2>
-            <p className="body">Soutenir les enfants malades, en situation de handicap ou de précarité et leurs familles, ainsi que les adultes qui en ont besoin.</p>
+            <h2>Quatre façons d'aider.</h2>
+            <p className="body">Elles soutiennent les enfants malades, en situation de handicap ou de précarité, leurs familles, et les adultes qui en ont besoin.</p>
           </div>
           {items.map(([src, t, s, tag]) => (
             <article className="panel card" key={t}>
@@ -163,10 +163,10 @@ function Actions() {
 
 function Journee() {
   const steps: [string, string, string, string][] = [
-    ['.05,.25', 'Rassembler', 'Les produits sont rassemblés et les paniers prennent forme.', "D'abord"],
-    ['.3,.5', 'Cuisiner', 'La soupe maison mijote, à déguster ensemble sur place.', 'Ensuite'],
-    ['.55,.75', 'Charger', 'Le camion est chargé, toute l\'équipe est mobilisée.', 'Direction Masny'],
-    ['.8,.98', 'Distribuer', 'Pensez à votre sac : les cagettes restent sur place.', 'Le plus souvent, 10 h – 12 h'],
+    ['.05,.25', 'Rassembler', 'On rassemble les produits et on prépare les paniers.', "D'abord"],
+    ['.3,.5', 'Cuisiner', 'La soupe maison mijote. On la mange ensemble sur place.', 'Ensuite'],
+    ['.55,.75', 'Charger', "Toute l'équipe s'y met pour charger le camion.", 'Direction Masny'],
+    ['.8,.98', 'Distribuer', 'Pensez à votre sac : les cagettes restent sur place.', 'Le plus souvent, de 10 h à 12 h'],
   ]
   return (
     <section className="pin journee" data-pin>
@@ -227,11 +227,11 @@ function Adhesion() {
     <section className="adhesion" id="adhesion">
       <div className="adh-copy" data-reveal>
         <span className="eyebrow">Adhérer</span>
-        <h2>Rejoignez l'aventure.</h2>
-        <p className="body">Pour les paniers solidaires, remplissez la <a href={FICHE} target="_blank" rel="noopener">fiche de renseignements</a> et remettez-la-nous lors d'une distribution ou en message privé. Chaque demande est étudiée avec discrétion et bienveillance.</p>
-        <p className="body">Une fois votre demande validée, l'adhésion est de {ADHESION} € par an et par foyer, avec une carte d'adhérent. Chaque panier retiré coûte ensuite {PANIER} €.</p>
-        <p className="note">Un don ouvre droit à une réduction d'impôt de 66 % : 30 € donnés ne coûtent que 10,20 €. Reçu fiscal remis.</p>
-        <p className="note">Une fête, une kermesse ? Louez nos tables et bancs en bois : 100 % des bénéfices financent nos actions.</p>
+        <h2>Comment nous rejoindre.</h2>
+        <p className="body">Pour les paniers solidaires, remplissez la <a href={FICHE} target="_blank" rel="noopener">fiche de renseignements</a> et donnez-la-nous à une distribution ou par message privé. Nous regardons chaque demande avec discrétion et bienveillance.</p>
+        <p className="body">Si votre demande est acceptée, l'adhésion coûte {ADHESION} € par an et par foyer, et vous recevez une carte d'adhérent. Ensuite, chaque panier retiré coûte {PANIER} €.</p>
+        <p className="note">Un don ouvre droit à une réduction d'impôt de 66 % : si vous donnez 30 €, il ne vous en coûte que 10,20 €. Nous vous remettons un reçu fiscal.</p>
+        <p className="note">Une fête, une kermesse ? Nous louons des tables et des bancs en bois, et 100 % des bénéfices financent nos actions.</p>
       </div>
       <form onSubmit={onSubmit} data-reveal style={delay(120)}>
         <p className="hp"><label>Ne pas remplir <input name="bot-field" tabIndex={-1} autoComplete="off" /></label></p>
