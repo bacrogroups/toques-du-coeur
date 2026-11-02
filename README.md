@@ -11,4 +11,13 @@ npm install
 npm run dev
 ```
 
+## Espace adhérent (`/adherent`)
+
+Code dans `src/adherent`, chargé à part de la vitrine. Données dans Supabase (projet `les-toques-du-coeur`).
+
+- Connexion par lien e-mail, sans mot de passe. Dans Supabase → *Authentication → URL Configuration*, ajouter `https://toques-du-coeur.netlify.app/adherent` aux *Redirect URLs*.
+- Schéma et règles d'accès : `supabase/migrations/20261102_espace_adherent.sql`. Un nouveau foyer est « en attente » : le bureau passe `statut` à `actif` et renseigne `adhesion_fin` (tableau Supabase en attendant l'espace gestion).
+- Les dates de distribution et de marché se créent dans la table `evenements` (pas de `lieu` pour un marché).
+- Rappels de la veille : fonction `supabase/functions/rappels-veille` (déployée sans vérification JWT), envoi par Brevo, lancée chaque soir par `supabase/migrations/20261102_rappels_veille.sql`. Secrets : `BREVO_API_KEY`, `CRON_SECRET`, `EXPEDITEUR_EMAIL`.
+
 Déploiement : chaque `git push` sur `main` déclenche un build Netlify (`npm run build` → `dist`).

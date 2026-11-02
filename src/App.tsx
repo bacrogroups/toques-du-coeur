@@ -19,8 +19,9 @@ function Nav() {
       </a>
       <nav aria-label="Navigation principale">
         <a href="#panier">Le panier</a>
-        <a href="#marche">Le marché</a>
+        <a className="opt-xs" href="#marche">Le marché</a>
         <a className="opt" href="#actions">Nos actions</a>
+        <a href="/adherent">Mon espace</a>
         <a className="pill sm" href="#adhesion">Adhérer</a>
       </nav>
     </header>
