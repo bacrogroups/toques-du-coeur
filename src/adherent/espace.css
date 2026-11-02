@@ -90,3 +90,9 @@
 .esp-tabs button[aria-current="page"]{background:var(--rose-soft);color:var(--rose-deep)}
 @media(min-width:700px){.esp-tabs{left:50%;right:auto;bottom:16px;width:520px;transform:translateX(-50%);border-radius:24px;box-shadow:0 0 0 1px var(--line),0 12px 30px -16px rgba(43,35,32,.4)}}
 @media(max-width:360px){.esp-two{grid-template-columns:1fr}.esp-choices{grid-template-columns:1fr}}
+
+/* Connexion classique */
+.esp-link{justify-self:end;margin-top:-6px;padding:4px 0;border:0;background:none;color:var(--rose-deep);font:inherit;font-size:15px;font-weight:700;text-decoration:underline;cursor:pointer}
+.esp-switch{justify-items:stretch;text-align:center}
+.esp-switch p{font-weight:700}
+.esp-center{text-align:center}
