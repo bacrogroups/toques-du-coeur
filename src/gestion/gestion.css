@@ -1,0 +1,160 @@
+/* Espace gestion : barre latérale sur tablette et ordinateur, onglets défilants sur téléphone.
+   S'appuie sur espace.css (boutons, formulaires, messages) et sur les couleurs de la vitrine. */
+.ges{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100svh;background:var(--paper)}
+.ges-side{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;gap:18px;padding:18px 14px;background:var(--white);box-shadow:1px 0 0 var(--line);overflow-y:auto}
+.ges-logo img{height:48px;width:auto}
+.ges-side nav{display:grid;gap:4px}
+.ges-side nav a{display:flex;align-items:center;gap:10px;padding:11px 12px;border-radius:14px;text-decoration:none;font-weight:700;font-size:16px;color:var(--muted)}
+.ges-side nav a span{font-size:18px}
+.ges-side nav a:hover{background:var(--cream);color:var(--ink)}
+.ges-side nav a[aria-current="page"]{background:var(--rose-soft);color:var(--rose-deep)}
+.ges-me{margin-top:auto;display:grid;gap:4px;padding:12px;border-radius:16px;background:var(--paper);font-size:14px}
+.ges-me span{overflow-wrap:anywhere;color:var(--muted)}
+.ges-me b{color:var(--rose-deep)}
+.ges-me a,.ges-me button{justify-self:start;padding:2px 0;border:0;background:none;font:inherit;font-size:14px;font-weight:700;color:var(--ink);text-decoration:underline;cursor:pointer}
+.ges-main{display:grid;gap:18px;align-content:start;padding:28px clamp(16px,3vw,40px) 60px;min-width:0;max-width:1180px}
+.ges h1{font-size:clamp(28px,3.4vw,40px);line-height:1.1}
+.ges h2{font-size:22px;line-height:1.2}
+.ges h3{font-size:18px;margin-top:6px}
+.cap::first-letter{text-transform:uppercase}
+
+.ges-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px}
+.ges-head > div:not(.ges-row){display:grid;gap:6px}
+.ges-row{display:flex;align-items:center;gap:10px;flex-wrap:nowrap}
+.ges-row.wrap{flex-wrap:wrap}
+.ges-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px;align-items:start}
+.ges-card{display:grid;gap:12px;align-content:start;justify-items:start;padding:20px;border-radius:22px;background:var(--white);box-shadow:0 0 0 1px var(--line);min-width:0}
+.ges-card > *{max-width:100%}
+.ges-card.big{grid-column:1/-1}
+.ges-empty{padding:28px;border-radius:20px;background:var(--white);box-shadow:0 0 0 1px var(--line);color:var(--muted);text-align:center}
+.ges-muted{color:var(--muted);font-weight:500}
+
+/* Boutons compacts (la gestion se fait souvent sur ordinateur ou tablette) */
+.ges-btn{display:inline-flex;align-items:center;justify-content:center;min-height:46px;padding:10px 18px;border:0;border-radius:14px;background:var(--rose);color:#fff;font:inherit;font-weight:800;font-size:16px;cursor:pointer;white-space:nowrap}
+.ges-btn:hover{background:var(--rose-deep)}
+.ges-btn.soft{background:var(--white);color:var(--ink);box-shadow:inset 0 0 0 2px var(--line)}
+.ges-btn.soft:hover{background:var(--cream)}
+.ges-btn.danger{color:var(--rose-deep)}
+.ges-btn:disabled{opacity:.5;cursor:not-allowed}
+.ges-mini{padding:6px 12px;border:0;border-radius:10px;background:var(--paper);box-shadow:inset 0 0 0 1px var(--line);font:inherit;font-size:14px;font-weight:700;color:var(--ink);cursor:pointer}
+.ges-mini.ok{background:var(--leaf-soft);color:#1f6b42;box-shadow:none}
+.ges-mini:disabled{opacity:.5}
+.ges-back{justify-self:start;padding:6px 0;border:0;background:none;font:inherit;font-weight:700;color:var(--rose-deep);cursor:pointer}
+.ges-back.light{color:#fff}
+.ges-scan{width:auto;min-height:52px}
+
+/* Chiffres clés */
+.ges-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;width:100%}
+.ges-kpis div{display:grid;gap:2px;padding:14px;border-radius:16px;background:var(--cream)}
+.ges-kpis div:nth-child(2){background:var(--leaf-soft)}
+.ges-kpis div:nth-child(3){background:var(--sun-soft)}
+.ges-kpis div:nth-child(4){background:var(--rose-soft)}
+.ges-kpis b{font-family:var(--display);font-weight:600;font-size:34px;line-height:1;font-variant-numeric:tabular-nums}
+.ges-kpis span{font-size:14px;font-weight:700;color:var(--muted)}
+.ges-kpis.stats b{font-size:40px}
+
+/* Étiquettes d'état */
+.ges-tag{display:inline-block;padding:3px 10px;border-radius:999px;font-size:13px;font-weight:800;white-space:nowrap;background:var(--cream);color:var(--muted)}
+.ges-tag.active{background:var(--leaf-soft);color:#1f6b42}
+.ges-tag.attente,.ges-tag.sun,.ges-tag.bientot{background:var(--sun-soft);color:#7a5600}
+.ges-tag.terminee,.ges-tag.suspendue{background:var(--rose-soft);color:var(--rose-deep)}
+
+/* Listes */
+.ges-list{list-style:none;margin:0;padding:0;display:grid;width:100%}
+.ges-list li{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-top:1px solid var(--line);font-size:15px}
+.ges-list li:first-child{border-top:0}
+.ges-list li.col{flex-direction:column;align-items:flex-start;gap:4px}
+.ges-list small{color:var(--muted)}
+.ges-list.pick li{padding:0;border:0}
+.ges-list.pick button{display:grid;width:100%;text-align:left;gap:2px;padding:12px;margin-top:6px;border:0;border-radius:14px;background:var(--paper);font:inherit;cursor:pointer}
+.ges-list.pick button:hover{background:var(--leaf-soft)}
+.ges-card.ges-list{padding:6px 20px}
+
+/* Recherche et filtres */
+.ges-filters{display:grid;gap:10px}
+.ges input[type="search"],.ges-drawer input[type="search"]{font-size:17px;padding:12px 14px;min-height:50px}
+.ges-chips{display:flex;flex-wrap:wrap;gap:8px}
+.ges-chips button{padding:8px 14px;border:0;border-radius:999px;background:var(--white);box-shadow:inset 0 0 0 2px var(--line);font:inherit;font-size:14px;font-weight:700;color:var(--muted);cursor:pointer}
+.ges-chips button[aria-pressed="true"]{background:var(--ink);color:#fff;box-shadow:none}
+
+/* Tableau des adhérents */
+.ges-table-wrap{overflow-x:auto;border-radius:20px;background:var(--white);box-shadow:0 0 0 1px var(--line)}
+.ges-table{width:100%;border-collapse:collapse;font-size:15px}
+.ges-table th{text-align:left;padding:12px 14px;font-size:13px;color:var(--muted);border-bottom:1px solid var(--line)}
+.ges-table td{padding:12px 14px;border-top:1px solid var(--line)}
+.ges-table tbody tr:first-child td{border-top:0}
+.ges-table tbody tr[tabindex]{cursor:pointer}
+.ges-table tbody tr[tabindex]:hover{background:var(--paper)}
+.ges-table .num{font-variant-numeric:tabular-nums;color:var(--muted)}
+.ges-table .r{text-align:right;font-variant-numeric:tabular-nums}
+.ges-table.compact td,.ges-table.compact th{padding:8px 4px}
+
+/* Panneau latéral (fiche, formulaires) */
+.ges-overlay{position:fixed;inset:0;z-index:50;display:flex;justify-content:flex-end;background:rgba(43,35,32,.35)}
+.ges-drawer{position:relative;display:grid;gap:14px;align-content:start;width:min(480px,100%);height:100%;overflow-y:auto;padding:28px 22px 40px;background:var(--paper);box-shadow:-20px 0 40px -20px rgba(43,35,32,.4)}
+.ges-close{position:absolute;top:12px;right:12px;width:44px;height:44px;border:0;border-radius:50%;background:var(--white);font-size:26px;line-height:1;cursor:pointer;box-shadow:0 0 0 1px var(--line)}
+.ges-drawer h2{padding-right:48px}
+.ges-drawer select{min-height:46px}
+.ges-dl{display:grid;grid-template-columns:auto 1fr;gap:8px 16px;margin:0;font-size:15px}
+.ges-dl dt{color:var(--muted);font-weight:700}
+.ges-dl dd{margin:0;overflow-wrap:anywhere}
+.ges-actions{display:grid;gap:8px}
+.ges-check{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.ges-check input{flex:none;width:22px;height:22px;min-height:0;padding:0;margin:0;accent-color:var(--leaf)}
+.esp-choices.two{grid-template-columns:1fr 1fr}
+.ges-inline{display:flex;align-items:center;gap:8px}
+
+/* Dates */
+.ges-cards{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}
+.ges-evt{display:grid;gap:6px;justify-items:start;width:100%;height:100%;padding:18px;border:0;border-radius:20px;background:var(--white);box-shadow:0 0 0 1px var(--line);font:inherit;text-align:left;cursor:pointer}
+.ges-evt:hover{box-shadow:0 0 0 2px var(--rose)}
+.ges-evt.marche{background:#f4fbf7}
+.ges-evt b{font-family:var(--display);font-weight:600;font-size:22px}
+
+/* Liste de pointage */
+.ges-pointage{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.ges-pointage li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:16px;background:var(--white);box-shadow:0 0 0 1px var(--line)}
+.ges-pointage li.fait{background:#f2faf5}
+.ges-pointage label{display:flex;align-items:center;gap:14px;font-weight:500;cursor:pointer;min-width:0}
+.ges-pointage input{width:28px;height:28px;min-height:0;padding:0;margin:0;flex:none;accent-color:var(--leaf)}
+.ges-pointage label span{display:grid}
+.ges-pointage small{color:var(--muted);font-size:14px}
+
+/* Scanner plein écran */
+.ges-scanner{position:fixed;inset:0;z-index:60;display:grid;grid-template-rows:auto minmax(0,1fr) auto;background:#1d1715;color:#fff}
+.ges-scanner-top{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 16px;font-weight:700}
+.ges-video{position:relative;display:grid;place-items:center;overflow:hidden}
+.ges-video video{width:100%;height:100%;object-fit:cover}
+.ges-video p{position:absolute;max-width:320px;padding:16px;text-align:center}
+.ges-viseur{position:absolute;width:min(62vw,300px);aspect-ratio:1;border-radius:28px;box-shadow:0 0 0 4px rgba(255,255,255,.9),0 0 0 100vmax rgba(0,0,0,.35)}
+.ges-result{display:grid;gap:6px;justify-items:center;text-align:center;padding:20px 16px calc(24px + env(safe-area-inset-bottom));background:#2b2320;min-height:150px;align-content:center}
+.ges-result b{font-family:var(--display);font-weight:600;font-size:28px}
+.ges-result small{opacity:.85;font-size:15px}
+.ges-result .big{font-weight:800;font-size:22px}
+.ges-result.ok{background:var(--leaf)}
+.ges-result.deja,.ges-result.sans{background:#9a6b00}
+.ges-result.inactif,.ges-result.inconnue,.ges-result.erreur{background:var(--rose-deep)}
+.ges-result .esp-btn{max-width:360px;background:#fff;color:var(--ink)}
+
+/* Planning */
+.ges-planning{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,320px),1fr));gap:14px}
+.ges-planning-head{display:flex;justify-content:space-between;gap:12px;width:100%}
+.ges-planning-head > div{display:grid;gap:4px}
+.ges-count{display:grid;justify-items:center;font-family:var(--display);font-weight:600;font-size:32px;line-height:1;color:var(--leaf)}
+.ges-count small{font-family:var(--body);font-size:12px;font-weight:800;color:var(--muted)}
+.ges-people{list-style:none;margin:0;padding:0;display:grid;gap:6px;width:100%}
+.ges-people li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:8px 12px;border-radius:12px;background:var(--paper);font-size:15px}
+.ges-people small{color:var(--muted)}
+
+/* Téléphone : la barre latérale devient une barre d'onglets en haut */
+@media(max-width:900px){
+  .ges{grid-template-columns:1fr}
+  .ges-side{position:sticky;z-index:20;height:auto;flex-direction:row;align-items:center;gap:8px;padding:8px 10px;box-shadow:0 1px 0 var(--line);overflow-x:auto;overflow-y:hidden}
+  .ges-logo img{height:34px}
+  .ges-side nav{display:flex;gap:4px}
+  .ges-side nav a{padding:8px 10px;font-size:14px;white-space:nowrap}
+  .ges-me{margin:0;padding:6px 10px;flex:none}
+  .ges-me span,.ges-me b{display:none}
+  .ges-main{padding:18px 16px 60px}
+  .hide-s{display:none}
+}

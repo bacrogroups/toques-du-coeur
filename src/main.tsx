@@ -3,12 +3,15 @@ import ReactDOM from 'react-dom/client'
 import App from './App'
 import './styles.css'
 
-// L'espace adhérent est chargé à part, pour que la vitrine reste légère.
+// Les espaces adhérent et gestion sont chargés à part, pour que la vitrine reste légère.
 const Espace = lazy(() => import('./adherent/Espace'))
-const espace = window.location.pathname.startsWith('/adherent')
+const Gestion = lazy(() => import('./gestion/Gestion'))
+const chemin = window.location.pathname
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    {espace ? <Suspense fallback={null}><Espace /></Suspense> : <App />}
+    {chemin.startsWith('/gestion') ? <Suspense fallback={null}><Gestion /></Suspense>
+      : chemin.startsWith('/adherent') ? <Suspense fallback={null}><Espace /></Suspense>
+      : <App />}
   </React.StrictMode>,
 )

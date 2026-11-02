@@ -29,7 +29,8 @@
 .esp-form input,.esp-form select,.esp-form textarea{font-size:18px;padding:14px;min-height:54px}
 .esp-two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px}
 .esp-form label{min-width:0}
-.esp-form input{min-width:0;-webkit-appearance:none;appearance:none}
+.esp-form input{min-width:0}
+.esp-form input:not([type="checkbox"]):not([type="radio"]){-webkit-appearance:none;appearance:none}
 .esp-field{border:0;margin:0;padding:0;display:grid;gap:10px}
 .esp-field legend{font-weight:700;font-size:15px;padding:0;margin-bottom:10px}
 .esp-stepper{display:flex;align-items:center;gap:14px}
@@ -96,3 +97,7 @@
 .esp-switch{justify-items:stretch;text-align:center}
 .esp-switch p{font-weight:700}
 .esp-center{text-align:center}
+
+/* Annonces de l'association */
+.esp-annonce{background:var(--sun-soft);box-shadow:none}
+.esp-annonce p{white-space:pre-line}

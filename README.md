@@ -20,4 +20,12 @@ Code dans `src/adherent`, chargé à part de la vitrine. Données dans Supabase 
 - Les dates de distribution et de marché se créent dans la table `evenements` (pas de `lieu` pour un marché).
 - Rappels de la veille : fonction `supabase/functions/rappels-veille` (déployée sans vérification JWT), envoi par Brevo, lancée chaque soir par `supabase/migrations/20261102_rappels_veille.sql`. Secrets : `BREVO_API_KEY`, `CRON_SECRET`, `EXPEDITEUR_EMAIL`.
 
+## Espace gestion (`/gestion`)
+
+Code dans `src/gestion`, pour le bureau (`role = 'admin'` dans la table `admins`) et les bénévoles (`role = 'benevole'`). Même connexion que l'espace adhérent.
+
+- Tableau de bord, adhérents (validation, renouvellement, foyers sans compte, export pour Excel), distributions (dates, réservations, pointage par QR code ou par liste), planning, messages groupés, statistiques et équipe.
+- Schéma : `supabase/migrations/20261102_espace_gestion.sql`.
+- Messages par e-mail ou SMS : fonction `supabase/functions/envoyer-message` (avec vérification JWT), envoi par Brevo. Sans clé Brevo, les messages restent affichés dans l'espace adhérent.
+
 Déploiement : chaque `git push` sur `main` déclenche un build Netlify (`npm run build` → `dist`).

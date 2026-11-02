@@ -8,6 +8,7 @@ export const supabase = createClient(URL, KEY)
 
 export type Foyer = {
   id: string
+  user_id: string | null
   numero: number
   carte: string
   prenom: string
@@ -19,6 +20,7 @@ export type Foyer = {
   rappel: 'email' | 'sms' | 'aucun'
   statut: 'en_attente' | 'actif' | 'suspendu'
   adhesion_fin: string | null
+  created_at: string
 }
 
 export type Evenement = {
@@ -30,9 +32,24 @@ export type Evenement = {
   lieu: string | null
   note: string | null
   paniers_max: number | null
+  publie?: boolean
 }
 
-export type Reservation = { id: string; evenement_id: string; semaine: string; statut: 'reservee' | 'annulee' | 'retiree' }
+export type Reservation = { id: string; evenement_id: string; semaine: string; statut: 'reservee' | 'annulee' | 'retiree'; foyer_id?: string; retiree_at?: string | null }
+export type Message = {
+  id: string
+  titre: string
+  texte: string
+  cible: 'tous' | 'actifs' | 'evenement'
+  evenement_id: string | null
+  par_email: boolean
+  par_sms: boolean
+  publie: boolean
+  expire_le: string | null
+  envoye_at: string | null
+  envois: number
+  created_at: string
+}
 export type Candidature = { id: string; created_at: string }
 export type Location = { id: string; date_debut: string; date_fin: string; tables: number; bancs: number; statut: 'demandee' | 'acceptee' | 'refusee' | 'annulee' }
 

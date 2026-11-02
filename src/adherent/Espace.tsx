@@ -3,8 +3,9 @@ import type { Session } from '@supabase/supabase-js'
 import QRCode from 'qrcode'
 import {
   aujourdhui, dateCourte, dateLongue, heure, message, supabase,
-  type Candidature, type Evenement, type Foyer, type Location, type Reservation,
+  type Candidature, type Evenement, type Foyer, type Location, type Message, type Reservation,
 } from './supabase'
+import { Connexion, NouveauMotDePasse, useSession } from './Connexion'
 import './espace.css'
 
 const TEL = '06 45 84 22 15'
@@ -13,21 +14,12 @@ const FICHE = 'https://drive.google.com/file/d/1PcrtDJr3N4-zxwTk8ZckMq1g6i3U-E1y
 type Onglet = 'carte' | 'paniers' | 'aider' | 'profil'
 
 export default function Espace() {
-  const [session, setSession] = useState<Session | null | undefined>(undefined)
-  const [reinitialisation, setReinitialisation] = useState(false)
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data }) => setSession(data.session))
-    const { data } = supabase.auth.onAuthStateChange((evt, s) => {
-      if (evt === 'PASSWORD_RECOVERY') setReinitialisation(true)
-      setSession(s)
-    })
-    return () => data.subscription.unsubscribe()
-  }, [])
+  const { session, reinitialisation, finReinitialisation } = useSession()
   useEffect(() => { document.title = 'Mon espace · Les Toqués du Cœur' }, [])
 
   let contenu: ReactNode
   if (session === undefined) contenu = <Chargement />
-  else if (session && reinitialisation) contenu = <NouveauMotDePasse onDone={() => setReinitialisation(false)} />
+  else if (session && reinitialisation) contenu = <NouveauMotDePasse onDone={finReinitialisation} />
   else if (session) contenu = <Connecte session={session} />
   else contenu = <Connexion />
 
@@ -44,128 +36,6 @@ export default function Espace() {
 
 function Chargement() {
   return <main className="esp-main"><p className="esp-wait" role="status">Chargement…</p></main>
-}
-
-/** Messages de Supabase Auth traduits pour les adhérents. */
-function erreurConnexion(e: unknown): string {
-  const m = message(e)
-  if (/invalid login credentials/i.test(m)) return 'E-mail ou mot de passe incorrect.'
-  if (/email not confirmed/i.test(m)) return 'Confirmez d\'abord votre adresse avec le lien reçu par e-mail.'
-  if (/already registered|already been registered/i.test(m)) return 'Un compte existe déjà avec cet e-mail. Connectez-vous, ou utilisez « Mot de passe oublié ».'
-  if (/password should be at least/i.test(m)) return 'Le mot de passe doit faire au moins 8 caractères.'
-  if (/rate limit|too many/i.test(m)) return 'Trop d\'essais d\'un coup. Patientez quelques minutes.'
-  return m
-}
-
-const RETOUR = () => window.location.origin + '/adherent'
-
-function Connexion() {
-  const [mode, setMode] = useState<'connexion' | 'inscription' | 'oubli'>('connexion')
-  const [envoi, setEnvoi] = useState(false)
-  const [erreur, setErreur] = useState('')
-  const [ok, setOk] = useState('')
-
-  function changer(m: typeof mode) { setMode(m); setErreur(''); setOk('') }
-
-  async function envoyer(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const d = new FormData(e.currentTarget)
-    const email = String(d.get('email')).trim()
-    const motDePasse = String(d.get('mot_de_passe') ?? '')
-    setErreur(''); setOk('')
-    if (mode === 'inscription' && motDePasse !== String(d.get('confirmation'))) { setErreur('Les deux mots de passe ne sont pas identiques.'); return }
-    setEnvoi(true)
-    if (mode === 'connexion') {
-      const { error } = await supabase.auth.signInWithPassword({ email, password: motDePasse })
-      if (error) setErreur(erreurConnexion(error))
-    } else if (mode === 'inscription') {
-      const { data, error } = await supabase.auth.signUp({ email, password: motDePasse, options: { emailRedirectTo: RETOUR() } })
-      if (error) setErreur(erreurConnexion(error))
-      // Sans session, Supabase attend la confirmation de l'adresse e-mail.
-      else if (!data.session) setOk('Compte créé ! Ouvrez l\'e-mail que nous venons d\'envoyer et touchez le lien pour confirmer votre adresse. Pensez à regarder dans les indésirables.')
-    } else {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: RETOUR() })
-      if (error) setErreur(erreurConnexion(error))
-      else setOk('Si un compte existe avec cet e-mail, vous allez recevoir un lien pour choisir un nouveau mot de passe.')
-    }
-    setEnvoi(false)
-  }
-
-  const titre = { connexion: 'Se connecter', inscription: 'Créer mon compte', oubli: 'Mot de passe oublié' }[mode]
-  const bouton = { connexion: 'Me connecter', inscription: 'Créer mon compte', oubli: 'Recevoir le lien' }[mode]
-
-  return (
-    <main className="esp-main">
-      <section className="esp-card">
-        <span className="eyebrow">Espace adhérent</span>
-        <h1>{titre}</h1>
-        {ok ? (
-          <p className="esp-ok" role="status">{ok}</p>
-        ) : (
-          <form onSubmit={envoyer} className="esp-form" key={mode}>
-            {mode === 'oubli' && <p>Entrez votre e-mail : vous recevez un lien pour choisir un nouveau mot de passe.</p>}
-            <label>E-mail<input name="email" type="email" required autoComplete="email" inputMode="email" /></label>
-            {mode !== 'oubli' && (
-              <label>Mot de passe
-                <input name="mot_de_passe" type="password" required minLength={mode === 'inscription' ? 8 : undefined}
-                  autoComplete={mode === 'inscription' ? 'new-password' : 'current-password'} />
-              </label>
-            )}
-            {mode === 'inscription' && (
-              <label>Confirmer le mot de passe<input name="confirmation" type="password" required minLength={8} autoComplete="new-password" /></label>
-            )}
-            {mode === 'connexion' && <button type="button" className="esp-link" onClick={() => changer('oubli')}>Mot de passe oublié ?</button>}
-            <button className="esp-btn" disabled={envoi}>{envoi ? 'Un instant…' : bouton}</button>
-            {erreur && <p className="esp-err" role="alert">{erreur}</p>}
-          </form>
-        )}
-      </section>
-      <section className="esp-card esp-switch">
-        {mode === 'connexion' ? (
-          <>
-            <p>Pas encore de compte ?</p>
-            <button className="esp-btn soft" onClick={() => changer('inscription')}>Créer un compte</button>
-          </>
-        ) : (
-          <>
-            <p>Vous avez déjà un compte ?</p>
-            <button className="esp-btn soft" onClick={() => changer('connexion')}>Se connecter</button>
-          </>
-        )}
-      </section>
-      <p className="esp-small esp-center">Un souci ? Appelez-nous au <a href="tel:+33645842215">{TEL}</a>.</p>
-    </main>
-  )
-}
-
-function NouveauMotDePasse({ onDone }: { onDone: () => void }) {
-  const [envoi, setEnvoi] = useState(false)
-  const [erreur, setErreur] = useState('')
-  async function enregistrer(e: FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    const d = new FormData(e.currentTarget)
-    const motDePasse = String(d.get('mot_de_passe'))
-    if (motDePasse !== String(d.get('confirmation'))) { setErreur('Les deux mots de passe ne sont pas identiques.'); return }
-    setEnvoi(true)
-    const { error } = await supabase.auth.updateUser({ password: motDePasse })
-    setEnvoi(false)
-    if (error) setErreur(erreurConnexion(error))
-    else onDone()
-  }
-  return (
-    <main className="esp-main">
-      <section className="esp-card">
-        <span className="eyebrow">Espace adhérent</span>
-        <h1>Nouveau mot de passe</h1>
-        <form onSubmit={enregistrer} className="esp-form">
-          <label>Nouveau mot de passe<input name="mot_de_passe" type="password" required minLength={8} autoComplete="new-password" /></label>
-          <label>Confirmer<input name="confirmation" type="password" required minLength={8} autoComplete="new-password" /></label>
-          <button className="esp-btn" disabled={envoi}>{envoi ? 'Un instant…' : 'Enregistrer'}</button>
-          {erreur && <p className="esp-err" role="alert">{erreur}</p>}
-        </form>
-      </section>
-    </main>
-  )
 }
 
 function Connecte({ session }: { session: Session }) {
@@ -242,6 +112,12 @@ function Carte({ foyer, allerPaniers }: { foyer: Foyer; allerPaniers: () => void
       setProchain(list[0] ? { r: list[0], e: list[0].evenements } : null)
     })()
   }, [])
+  const [annonces, setAnnonces] = useState<Message[]>([])
+  useEffect(() => {
+    // Les règles d'accès ne renvoient que les messages publiés qui concernent ce foyer.
+    void supabase.from('messages').select('*').eq('publie', true).order('created_at', { ascending: false }).limit(5)
+      .then(({ data }) => setAnnonces((data ?? []) as Message[]))
+  }, [])
 
   const actif = adhesionActive(foyer)
   let statut: ReactNode
@@ -262,6 +138,15 @@ function Carte({ foyer, allerPaniers }: { foyer: Foyer; allerPaniers: () => void
         {actif && qr && <div className="esp-qr" role="img" aria-label="QR code de la carte" dangerouslySetInnerHTML={{ __html: qr }} />}
         {statut}
       </section>
+
+      {annonces.map((m) => (
+        <section key={m.id} className="esp-card esp-annonce">
+          <span className="eyebrow sun">Message de l'association</span>
+          <h2>{m.titre}</h2>
+          <p>{m.texte}</p>
+          <p className="esp-small">Le {dateCourte(m.created_at.slice(0, 10))}</p>
+        </section>
+      ))}
 
       {foyer.statut === 'en_attente' && (
         <section className="esp-card">
@@ -555,12 +440,21 @@ function ProfilForm({ foyer, userId, onSaved }: { foyer?: Foyer; userId?: string
 }
 
 function Profil({ foyer, onSaved }: { foyer: Foyer; onSaved: () => void }) {
+  const [equipe, setEquipe] = useState(false)
+  useEffect(() => { void supabase.rpc('est_equipe').then(({ data }) => setEquipe(data === true)) }, [])
   return (
     <>
       <div className="esp-head">
         <h1>Mon profil</h1>
         <p>Connecté avec {foyer.email}</p>
       </div>
+      {equipe && (
+        <section className="esp-card">
+          <span className="eyebrow green">Équipe</span>
+          <p>Vous faites partie de l'équipe des Toqués du Cœur.</p>
+          <a className="esp-btn" href="/gestion">Ouvrir l'espace gestion</a>
+        </section>
+      )}
       <section className="esp-card"><ProfilForm foyer={foyer} onSaved={onSaved} /></section>
       <section className="esp-card">
         <p className="esp-small">Nous gardons le strict nécessaire pour préparer les paniers. Rien n'est transmis à des tiers. Pour supprimer votre compte, appelez-nous au {TEL}.</p>
