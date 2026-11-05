@@ -44,10 +44,10 @@ function Connecte({ session }: { session: Session }) {
   const [erreur, setErreur] = useState('')
 
   const charger = useCallback(async () => {
-    const { data, error } = await supabase.from('foyers').select('*').maybeSingle()
+    const { data, error } = await supabase.from('foyers').select('*').eq('user_id', session.user.id).maybeSingle()
     if (error) setErreur(message(error))
     else setFoyer(data as Foyer | null)
-  }, [])
+  }, [session.user.id])
   useEffect(() => { void charger() }, [charger])
 
   if (erreur) return <main className="esp-main"><p className="esp-err" role="alert">{erreur}</p></main>
@@ -106,12 +106,12 @@ function Carte({ foyer, allerPaniers }: { foyer: Foyer; allerPaniers: () => void
     void (async () => {
       const { data } = await supabase.from('reservations')
         .select('id, evenement_id, semaine, statut, evenements!inner(*)')
-        .eq('statut', 'reservee').gte('evenements.jour', aujourdhui())
+        .eq('foyer_id', foyer.id).eq('statut', 'reservee').gte('evenements.jour', aujourdhui())
       const list = (data ?? []) as unknown as (Reservation & { evenements: Evenement })[]
       list.sort((a, b) => a.evenements.jour.localeCompare(b.evenements.jour))
       setProchain(list[0] ? { r: list[0], e: list[0].evenements } : null)
     })()
-  }, [])
+  }, [foyer.id])
   const [annonces, setAnnonces] = useState<Message[]>([])
   useEffect(() => {
     // Les règles d'accès ne renvoient que les messages publiés qui concernent ce foyer.
@@ -190,8 +190,8 @@ function Paniers({ foyer }: { foyer: Foyer }) {
 
   const charger = useCallback(async () => {
     const [{ data: evts, error }, { data: rs }] = await Promise.all([
-      supabase.from('evenements').select('*').gte('jour', aujourdhui()).order('jour').order('heure_debut').limit(30),
-      supabase.from('reservations').select('id, evenement_id, semaine, statut').neq('statut', 'annulee'),
+      supabase.from('evenements').select('*').eq('publie', true).gte('jour', aujourdhui()).order('jour').order('heure_debut').limit(30),
+      supabase.from('reservations').select('id, evenement_id, semaine, statut').eq('foyer_id', foyer.id).neq('statut', 'annulee'),
     ])
     if (error) { setMsg({ ok: false, texte: message(error) }); setEvenements([]); return }
     const list = (evts ?? []) as Evenement[]
@@ -200,7 +200,7 @@ function Paniers({ foyer }: { foyer: Foyer }) {
     const distribs = list.filter((e) => e.type === 'distribution' && e.paniers_max !== null)
     const res = await Promise.all(distribs.map((e) => supabase.rpc('places_restantes', { evt: e.id })))
     setPlaces(Object.fromEntries(distribs.map((e, i) => [e.id, (res[i].data as number | null) ?? null])))
-  }, [])
+  }, [foyer.id])
   useEffect(() => { void charger() }, [charger])
 
   async function reserver(e: Evenement) {
@@ -281,12 +281,12 @@ function Aider({ foyer }: { foyer: Foyer }) {
 
   const charger = useCallback(async () => {
     const [{ data: c }, { data: l }] = await Promise.all([
-      supabase.from('candidatures_benevoles').select('id, created_at').order('created_at', { ascending: false }).limit(1).maybeSingle(),
-      supabase.from('locations').select('id, date_debut, date_fin, tables, bancs, statut').order('date_debut', { ascending: false }),
+      supabase.from('candidatures_benevoles').select('id, created_at').eq('foyer_id', foyer.id).order('created_at', { ascending: false }).limit(1).maybeSingle(),
+      supabase.from('locations').select('id, date_debut, date_fin, tables, bancs, statut').eq('foyer_id', foyer.id).order('date_debut', { ascending: false }),
     ])
     setCandidature((c as Candidature | null) ?? null)
     setLocations((l ?? []) as Location[])
-  }, [])
+  }, [foyer.id])
   useEffect(() => { void charger() }, [charger])
 
   async function benevole(e: FormEvent<HTMLFormElement>) {
