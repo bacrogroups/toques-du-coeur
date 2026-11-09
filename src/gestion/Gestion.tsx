@@ -5,6 +5,7 @@ import type { Role } from './outils'
 import Tableau from './Tableau'
 import Adherents from './Adherents'
 import Distributions from './Distributions'
+import Collectivites from './Collectivites'
 import Planning from './Planning'
 import Messages from './Messages'
 import Statistiques from './Statistiques'
@@ -12,12 +13,13 @@ import Equipe from './Equipe'
 import '../adherent/espace.css'
 import './gestion.css'
 
-export type Page = 'tableau' | 'adherents' | 'distributions' | 'planning' | 'messages' | 'statistiques' | 'equipe'
+export type Page = 'tableau' | 'adherents' | 'distributions' | 'collectivites' | 'planning' | 'messages' | 'statistiques' | 'equipe'
 
 const PAGES: { id: Page; label: string; icone: string; admin?: boolean }[] = [
   { id: 'tableau', label: 'Tableau de bord', icone: '🏠' },
   { id: 'adherents', label: 'Adhérents', icone: '👥' },
   { id: 'distributions', label: 'Distributions', icone: '🧺' },
+  { id: 'collectivites', label: 'Collectivités', icone: '🏛️' },
   { id: 'planning', label: 'Planning', icone: '📅' },
   { id: 'messages', label: 'Messages', icone: '✉️', admin: true },
   { id: 'statistiques', label: 'Statistiques', icone: '📊' },
@@ -100,6 +102,7 @@ function Interface({ role, email, userId }: { role: Role; email: string; userId:
         {p === 'tableau' && <Tableau role={role} aller={aller} />}
         {p === 'adherents' && <Adherents role={role} />}
         {p === 'distributions' && <Distributions role={role} />}
+        {p === 'collectivites' && <Collectivites role={role} />}
         {p === 'planning' && <Planning role={role} userId={userId} />}
         {p === 'messages' && <Messages />}
         {p === 'statistiques' && <Statistiques />}

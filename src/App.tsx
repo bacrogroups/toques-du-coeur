@@ -277,6 +277,7 @@ function Footer() {
         <div><b>Nous trouver</b><p>64 rue Charles Debarge<br />62440 Harnes</p><p>Paniers à Masny : 49C rue de la Fabrique, cour des Galibots, chez Habitat Solidaire</p></div>
         <div><b>Nous écrire</b><p><a href={`mailto:${EMAIL}`}>{EMAIL}</a><br /><a href="tel:+33645842215">{TEL}</a></p></div>
         <div><b>Nous suivre</b><p><a href={FACEBOOK} target="_blank" rel="noopener">Facebook</a></p></div>
+        <div><b>Collectivités</b><p>Mairies, CCAS, écoles : <a href="/collectivite">commandez des paniers</a> et suivez vos commandes.</p></div>
       </div>
       <p className="mega" data-reveal>Les Toqués du Cœur</p>
       <p className="credit">© {new Date().getFullYear()} Association loi 1901 d'intérêt général · Photos : Les Toqués du Cœur · Site créé par Studio Instinct</p>

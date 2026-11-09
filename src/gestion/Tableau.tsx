@@ -11,6 +11,7 @@ export default function Tableau({ role, aller }: { role: Role; aller: (p: Page) 
   const [benevoles, setBenevoles] = useState(0)
   const [foyers, setFoyers] = useState<Foyer[]>([])
   const [locations, setLocations] = useState<Location[]>([])
+  const [coll, setColl] = useState({ demandes: 0, cours: 0, comptes: 0 })
   const [erreur, setErreur] = useState('')
 
   const charger = useCallback(async () => {
@@ -30,6 +31,11 @@ export default function Tableau({ role, aller }: { role: Role; aller: (p: Page) 
       setCompte({ reservees: rs?.length ?? 0, retirees: rs?.filter((r) => r.statut === 'retiree').length ?? 0 })
       setBenevoles(count ?? 0)
     }
+    const [{ data: cmds }, { count: comptes }] = await Promise.all([
+      supabase.from('commandes').select('statut').in('statut', ['demandee', 'validee', 'en_preparation', 'prete']),
+      supabase.from('collectivites').select('id', { count: 'exact', head: true }).eq('statut', 'en_attente'),
+    ])
+    setColl({ demandes: cmds?.filter((c) => c.statut === 'demandee').length ?? 0, cours: cmds?.filter((c) => c.statut !== 'demandee').length ?? 0, comptes: comptes ?? 0 })
     if (role === 'admin') {
       const { data: ls } = await supabase.from('locations').select('id, date_debut, date_fin, tables, bancs, message, foyers(prenom, nom, telephone, email)').eq('statut', 'demandee').order('date_debut')
       setLocations((ls ?? []) as unknown as Location[])
@@ -84,6 +90,16 @@ export default function Tableau({ role, aller }: { role: Role; aller: (p: Page) 
             <div><b>{attente.length}</b><span>en attente de validation</span></div>
           </div>
           {attente.length > 0 && <button className="esp-btn soft" onClick={() => aller('adherents')}>Valider les demandes</button>}
+        </section>
+
+        <section className="ges-card">
+          <span className="eyebrow">Commandes des collectivités</span>
+          <div className="ges-kpis two">
+            <div><b>{coll.demandes}</b><span>demandes à traiter</span></div>
+            <div><b>{coll.cours}</b><span>en cours</span></div>
+          </div>
+          {coll.comptes > 0 && <p className="esp-small">{coll.comptes} compte{coll.comptes > 1 ? 's' : ''} de structure à valider.</p>}
+          <button className="esp-btn soft" onClick={() => aller('collectivites')}>Voir les commandes</button>
         </section>
 
         <section className="ges-card">
