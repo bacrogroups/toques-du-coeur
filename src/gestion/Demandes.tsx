@@ -104,7 +104,12 @@ function Fiche({ demande: d, role, onClose, onChange }: { demande: Demande; role
   const [occupe, setOccupe] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; texte: string } | null>(null)
   const [note, setNote] = useState(d.note ?? '')
+  const [existant, setExistant] = useState<{ numero: number; user_id: string | null } | null>(null)
   const bureau = role === 'admin'
+  // Depuis le formulaire, la personne qui adhère crée elle-même son compte et son foyer.
+  useEffect(() => {
+    void supabase.from('foyers').select('numero, user_id').ilike('email', d.email.trim()).limit(1).then(({ data }) => setExistant(data?.[0] ?? null))
+  }, [d.email])
 
   async function changer(champs: Partial<Demande>, ok: string) {
     setOccupe(true)
@@ -149,12 +154,13 @@ function Fiche({ demande: d, role, onClose, onChange }: { demande: Demande; role
           <>
             <h3>Suivi</h3>
             <div className="ges-row" style={{ flexWrap: 'wrap', gap: 8 }}>
-              {estAdhesion(d) && !d.foyer_id && <button className="ges-btn" disabled={occupe} onClick={creerFoyer}>Créer le foyer adhérent</button>}
+              {estAdhesion(d) && !d.foyer_id && !existant && <button className="ges-btn" disabled={occupe} onClick={creerFoyer}>Créer le foyer adhérent</button>}
               {d.statut !== 'traitee' && <button className="ges-btn soft" disabled={occupe} onClick={() => changer({ statut: 'traitee', traitee_at: new Date().toISOString() }, 'Demande marquée comme traitée.')}>Marquer traitée</button>}
               {d.statut !== 'archivee' && <button className="ges-btn soft" disabled={occupe} onClick={() => changer({ statut: 'archivee' }, 'Demande archivée.')}>Archiver</button>}
               {d.statut !== 'nouvelle' && <button className="ges-btn soft" disabled={occupe} onClick={() => changer({ statut: 'nouvelle', traitee_at: null }, 'Demande remise en « nouvelle ».')}>Remettre en nouvelle</button>}
             </div>
-            {d.foyer_id && <p className="esp-small">Un foyer a été créé pour cette demande (page Adhérents).</p>}
+            {existant ? <p className="esp-small">Foyer N° {String(existant.numero).padStart(4, '0')} déjà inscrit avec cet e-mail{existant.user_id ? ', avec un compte en ligne' : ''} : validez l'adhésion dans la page Adhérents.</p>
+              : d.foyer_id && <p className="esp-small">Un foyer a été créé pour cette demande (page Adhérents).</p>}
             <form className="esp-form" onSubmit={(e) => { e.preventDefault(); void changer({ note: note.trim() || null }, 'Note enregistrée.') }}>
               <label>Note interne<textarea rows={3} maxLength={1000} value={note} onChange={(e) => setNote(e.target.value)} /></label>
               <button className="esp-btn soft" disabled={occupe}>Enregistrer la note</button>

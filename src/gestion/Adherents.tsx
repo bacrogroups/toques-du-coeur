@@ -170,6 +170,8 @@ function Fiche({ foyer: f, role, onClose, onChange }: { foyer: Foyer; role: Role
           </div>
         )}
 
+        {role === 'admin' && f.user_id && <MotDePasse foyer={f} />}
+
         <h3>Réserver un panier pour ce foyer</h3>
         {dates.length === 0 ? <p className="esp-small">Aucune distribution à venir.</p> : (
           <div className="ges-row">
@@ -250,5 +252,40 @@ function NouveauFoyer({ onClose, onCreated }: { onClose: () => void; onCreated: 
         </form>
       </aside>
     </div>
+  )
+}
+
+/** Mot de passe facile à dicter au téléphone : un mot, un tiret, quatre chiffres. */
+function motDePasseLisible(): string {
+  const mots = ['Panier', 'Tomate', 'Carotte', 'Poireau', 'Navet', 'Pomme', 'Cerise', 'Radis', 'Melon', 'Fraise']
+  const n = new Uint32Array(2)
+  crypto.getRandomValues(n)
+  return `${mots[n[0] % mots.length]}-${String(n[1] % 10000).padStart(4, '0')}`
+}
+
+function MotDePasse({ foyer }: { foyer: Foyer }) {
+  const [ouvert, setOuvert] = useState(false)
+  const [mdp, setMdp] = useState('')
+  const [envoi, setEnvoi] = useState(false)
+  const [msg, setMsg] = useState<{ ok: boolean; texte: string } | null>(null)
+  async function enregistrer(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setEnvoi(true); setMsg(null)
+    const { error } = await supabase.rpc('bureau_mot_de_passe', { foyer: foyer.id, mot_de_passe: mdp })
+    setEnvoi(false)
+    setMsg(error ? { ok: false, texte: message(error) } : { ok: true, texte: `C'est fait. Donnez ce mot de passe à ${foyer.prenom} : ${mdp}. Son compte est aussi activé.` })
+  }
+  if (!ouvert) return <button className="esp-btn soft" onClick={() => { setMdp(motDePasseLisible()); setOuvert(true); setMsg(null) }}>Donner un nouveau mot de passe</button>
+  return (
+    <form className="esp-form" onSubmit={enregistrer}>
+      <h3>Nouveau mot de passe</h3>
+      <p className="esp-small">Pour un adhérent qui a oublié son mot de passe ou dont le compte n'est pas activé. Communiquez-le-lui de vive voix ou par téléphone ; il pourra se connecter avec {foyer.email ?? 'son e-mail'}.</p>
+      <label>Mot de passe<input value={mdp} onChange={(e) => setMdp(e.target.value)} minLength={8} required autoComplete="off" /></label>
+      <div className="ges-row">
+        <button className="esp-btn" disabled={envoi}>{envoi ? 'Un instant…' : 'Enregistrer ce mot de passe'}</button>
+        <button type="button" className="esp-btn soft" onClick={() => setOuvert(false)}>Fermer</button>
+      </div>
+      {msg && <p className={msg.ok ? 'esp-ok' : 'esp-err'} role={msg.ok ? 'status' : 'alert'}>{msg.texte}</p>}
+    </form>
   )
 }

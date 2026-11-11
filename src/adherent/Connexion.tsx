@@ -22,9 +22,10 @@ export function useSession() {
 /** Messages de Supabase Auth traduits pour les adhérents. */
 function erreurConnexion(e: unknown): string {
   const m = message(e)
-  if (/invalid login credentials/i.test(m)) return 'E-mail ou mot de passe incorrect.'
-  if (/email not confirmed/i.test(m)) return 'Confirmez d\'abord votre adresse avec le lien reçu par e-mail.'
+  if (/invalid login credentials/i.test(m)) return 'E-mail ou mot de passe incorrect. Pas encore de compte ? Touchez « Créer un compte » plus bas, avec la même adresse e-mail.'
+  if (/email not confirmed/i.test(m)) return `Votre compte n'est pas encore activé. Appelez-nous au ${TEL}, le Bureau l'active tout de suite.`
   if (/already registered|already been registered/i.test(m)) return 'Un compte existe déjà avec cet e-mail. Connectez-vous, ou utilisez « Mot de passe oublié ».'
+  if (/email address .* is invalid|error sending|sending .*email/i.test(m)) return `Nous ne pouvons pas créer votre compte en ligne pour le moment. Appelez-nous au ${TEL}, le Bureau le crée avec vous.`
   if (/password should be at least/i.test(m)) return 'Le mot de passe doit faire au moins 8 caractères.'
   if (/rate limit|too many/i.test(m)) return 'Trop d\'essais d\'un coup. Patientez quelques minutes.'
   return m
@@ -56,11 +57,11 @@ export function Connexion({ espace = 'Espace adhérent' }: { espace?: string }) 
       const { data, error } = await supabase.auth.signUp({ email, password: motDePasse, options: { emailRedirectTo: RETOUR() } })
       if (error) setErreur(erreurConnexion(error))
       // Sans session, Supabase attend la confirmation de l'adresse e-mail.
-      else if (!data.session) setOk('Compte créé ! Ouvrez l\'e-mail que nous venons d\'envoyer et touchez le lien pour confirmer votre adresse. Pensez à regarder dans les indésirables.')
+      else if (!data.session) setOk(`Compte créé ! Le Bureau l'active très vite. En cas de souci, appelez-nous au ${TEL}.`)
     } else {
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: RETOUR() })
       if (error) setErreur(erreurConnexion(error))
-      else setOk('Si un compte existe avec cet e-mail, vous allez recevoir un lien pour choisir un nouveau mot de passe.')
+      else setOk(`Si un compte existe avec cet e-mail, un lien part pour choisir un nouveau mot de passe. Rien reçu après quelques minutes ? Appelez-nous au ${TEL} : le Bureau vous donne un nouveau mot de passe.`)
     }
     setEnvoi(false)
   }
@@ -77,7 +78,7 @@ export function Connexion({ espace = 'Espace adhérent' }: { espace?: string }) 
           <p className="esp-ok" role="status">{ok}</p>
         ) : (
           <form onSubmit={envoyer} className="esp-form" key={mode}>
-            {mode === 'oubli' && <p>Entrez votre e-mail : vous recevez un lien pour choisir un nouveau mot de passe.</p>}
+            {mode === 'oubli' && <p>Le plus simple : appelez-nous au <a href="tel:+33645842215">{TEL}</a>, le Bureau vous donne un nouveau mot de passe. Vous pouvez aussi demander un lien par e-mail.</p>}
             <label>E-mail<input name="email" type="email" required autoComplete="email" inputMode="email" /></label>
             {mode !== 'oubli' && (
               <label>Mot de passe

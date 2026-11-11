@@ -211,28 +211,57 @@ function Chiffres() {
 }
 
 function Adhesion() {
-  const [state, setState] = useState<'idle' | 'sending' | 'ok' | 'err'>('idle')
+  const [state, setState] = useState<'idle' | 'sending' | 'ok' | 'compte' | 'attente' | 'sanscompte' | 'existe' | 'err'>('idle')
+  const [erreur, setErreur] = useState('')
+  const [souhait, setSouhait] = useState(`Adhérer (${ADHESION} €/an)`)
+  const adherer = souhait.startsWith('Adhérer')
   async function onSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
     const form = e.currentTarget
     const data = new FormData(form)
     data.set('form-name', 'adhesion')
     if (data.get('bot-field')) { setState('ok'); form.reset(); return }
-    setState('sending')
     const champ = (k: string) => String(data.get(k) ?? '').trim() || null
+    const motDePasse = String(data.get('mot_de_passe') ?? '')
+    setErreur('')
+    if (adherer && motDePasse.length < 8) { setErreur('Le mot de passe doit faire au moins 8 caractères.'); return }
+    if (adherer && motDePasse !== String(data.get('confirmation') ?? '')) { setErreur('Les deux mots de passe ne sont pas identiques.'); return }
+    // Les mots de passe ne partent jamais ailleurs que vers Supabase Auth.
+    data.delete('mot_de_passe'); data.delete('confirmation')
+    setState('sending')
+    let fin: 'ok' | 'compte' | 'attente' | 'sanscompte' = 'ok'
     try {
+      if (adherer) {
+        // Création du compte de l'espace adhérent, puis de son foyer « en attente » que le Bureau valide.
+        const { supabase } = await import('./adherent/supabase')
+        const { data: inscrit, error } = await supabase.auth.signUp({ email: champ('email')!, password: motDePasse, options: { emailRedirectTo: window.location.origin + '/adherent' } })
+        if (error && /already|registered|exists/i.test(error.message)) { setState('existe'); return }
+        if (error && /password/i.test(error.message)) throw error
+        if (inscrit.user && inscrit.user.identities?.length === 0) { setState('existe'); return }
+        // Compte impossible à créer (envoi d'e-mail refusé…) : la demande part quand même au Bureau.
+        if (error) fin = 'sanscompte'
+        else if (inscrit.session) {
+          const { error: e2 } = await supabase.from('foyers').insert({ user_id: inscrit.session.user.id, prenom: champ('prenom'), nom: champ('nom'), telephone: champ('telephone'), ville: champ('ville') })
+          if (e2) throw e2
+          fin = 'compte'
+        } else fin = 'attente'
+      }
+      if (fin === 'sanscompte') data.set('message', `${champ('message') ?? ''}\n[Compte en ligne non créé, à faire par le Bureau]`.trim())
       // La demande est enregistrée dans la base, pour apparaître dans l'espace gestion.
       const res = await fetch(`${SUPABASE_URL}/rest/v1/demandes`, {
         method: 'POST',
         headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-        body: JSON.stringify({ prenom: champ('prenom'), nom: champ('nom'), email: champ('email'), telephone: champ('telephone'), ville: champ('ville'), souhait: champ('souhait'), message: champ('message') }),
+        body: JSON.stringify({ prenom: champ('prenom'), nom: champ('nom'), email: champ('email'), telephone: champ('telephone'), ville: champ('ville'), souhait: champ('souhait'), message: fin === 'sanscompte' ? String(data.get('message')) : champ('message') }),
       })
-      if (!res.ok) throw new Error(String(res.status))
+      if (!res.ok && (fin === 'ok' || fin === 'sanscompte')) throw new Error(String(res.status))
       // Copie Netlify Forms, pour la notification par e-mail (sans bloquer si elle échoue).
       void fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data as unknown as Record<string, string>).toString() }).catch(() => {})
-      setState('ok')
+      setState(fin)
       form.reset()
-    } catch {
+      setSouhait(`Adhérer (${ADHESION} €/an)`)
+    } catch (err) {
+      const m = err instanceof Error ? err.message : ''
+      if (/password/i.test(m)) { setErreur('Ce mot de passe est trop simple, choisissez-en un autre.'); setState('idle'); return }
       setState('err')
     }
   }
@@ -261,7 +290,7 @@ function Adhesion() {
             <select name="ville" defaultValue="Harnes"><option>Harnes</option><option>Masny</option><option>Autre</option></select>
           </label>
           <label>Je souhaite
-            <select name="souhait" defaultValue={`Adhérer (${ADHESION} €/an)`}>
+            <select name="souhait" value={souhait} onChange={(e) => setSouhait(e.target.value)}>
               <option>Adhérer ({ADHESION} €/an)</option>
               <option>Réserver un panier solidaire</option>
               <option>Devenir bénévole</option>
@@ -272,9 +301,23 @@ function Adhesion() {
             </select>
           </label>
         </div>
+        {adherer && (
+          <>
+            <p className="legal">Choisissez un mot de passe : il vous servira à vous connecter à votre espace adhérent, pour réserver vos paniers.</p>
+            <div className="row2">
+              <label>Mot de passe<input name="mot_de_passe" type="password" required minLength={8} autoComplete="new-password" placeholder="8 caractères minimum" /></label>
+              <label>Confirmer le mot de passe<input name="confirmation" type="password" required minLength={8} autoComplete="new-password" /></label>
+            </div>
+          </>
+        )}
         <label>Un mot pour nous<textarea name="message" rows={3} /></label>
         <button className="pill" type="submit" disabled={state === 'sending'}>{state === 'sending' ? 'Envoi…' : 'Envoyer ma demande'}</button>
+        {erreur && <p className="msg" role="alert">{erreur}</p>}
         {state === 'ok' && <p className="msg" role="status">Merci ! Votre demande est bien reçue, nous vous recontactons très vite.</p>}
+        {state === 'compte' && <p className="msg" role="status">Merci ! Votre compte est créé et votre demande est envoyée. Le Bureau valide votre adhésion au règlement des {ADHESION} €. Vous pouvez déjà vous connecter à votre <a href="/adherent">espace adhérent</a> avec votre e-mail et votre mot de passe.</p>}
+        {state === 'attente' && <p className="msg" role="status">Merci ! Votre demande est envoyée et votre compte est créé. Le Bureau l'active très vite ; vous pourrez ensuite vous connecter à votre <a href="/adherent">espace adhérent</a>.</p>}
+        {state === 'sanscompte' && <p className="msg" role="status">Merci ! Votre demande est bien reçue. Votre compte en ligne n'a pas pu être créé tout de suite : le Bureau s'en occupe et vous recontacte très vite.</p>}
+        {state === 'existe' && <p className="msg" role="alert">Un compte existe déjà avec cet e-mail. Connectez-vous à votre <a href="/adherent">espace adhérent</a>. Mot de passe perdu ? Appelez-nous au {TEL}.</p>}
         {state === 'err' && <p className="msg" role="alert">L'envoi a échoué. Écrivez-nous à {EMAIL}.</p>}
         <p className="legal">Vos informations servent uniquement à gérer votre adhésion. Elles ne sont jamais transmises à des tiers.</p>
       </form>
