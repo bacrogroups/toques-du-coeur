@@ -12,6 +12,7 @@ export default function Tableau({ role, aller }: { role: Role; aller: (p: Page) 
   const [foyers, setFoyers] = useState<Foyer[]>([])
   const [locations, setLocations] = useState<Location[]>([])
   const [coll, setColl] = useState({ demandes: 0, cours: 0, comptes: 0 })
+  const [nouvelles, setNouvelles] = useState(0)
   const [erreur, setErreur] = useState('')
 
   const charger = useCallback(async () => {
@@ -20,6 +21,8 @@ export default function Tableau({ role, aller }: { role: Role; aller: (p: Page) 
       supabase.from('foyers').select('*'),
     ])
     if (error) { setErreur(message(error)); return }
+    const { count: nd } = await supabase.from('demandes').select('id', { count: 'exact', head: true }).eq('statut', 'nouvelle')
+    setNouvelles(nd ?? 0)
     const e = (evts?.[0] as Evenement | undefined) ?? null
     setProchaine(e)
     setFoyers((fs ?? []) as Foyer[])
@@ -89,6 +92,7 @@ export default function Tableau({ role, aller }: { role: Role; aller: (p: Page) 
             <div><b>{actifs}</b><span>adhésions actives</span></div>
             <div><b>{attente.length}</b><span>en attente de validation</span></div>
           </div>
+          {nouvelles > 0 && <button className="esp-btn" onClick={() => aller('demandes')}>{nouvelles} nouvelle{nouvelles > 1 ? 's' : ''} demande{nouvelles > 1 ? 's' : ''} reçue{nouvelles > 1 ? 's' : ''} par le site</button>}
           {attente.length > 0 && <button className="esp-btn soft" onClick={() => aller('adherents')}>Valider les demandes</button>}
         </section>
 

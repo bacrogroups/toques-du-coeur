@@ -4,6 +4,7 @@ import { supabase } from '../adherent/supabase'
 import type { Role } from './outils'
 import Tableau from './Tableau'
 import Adherents from './Adherents'
+import Demandes from './Demandes'
 import Distributions from './Distributions'
 import Collectivites from './Collectivites'
 import Planning from './Planning'
@@ -13,10 +14,11 @@ import Equipe from './Equipe'
 import '../adherent/espace.css'
 import './gestion.css'
 
-export type Page = 'tableau' | 'adherents' | 'distributions' | 'collectivites' | 'planning' | 'messages' | 'statistiques' | 'equipe'
+export type Page = 'tableau' | 'demandes' | 'adherents' | 'distributions' | 'collectivites' | 'planning' | 'messages' | 'statistiques' | 'equipe'
 
 const PAGES: { id: Page; label: string; icone: string; admin?: boolean }[] = [
   { id: 'tableau', label: 'Tableau de bord', icone: '🏠' },
+  { id: 'demandes', label: 'Demandes', icone: '📥' },
   { id: 'adherents', label: 'Adhérents', icone: '👥' },
   { id: 'distributions', label: 'Distributions', icone: '🧺' },
   { id: 'collectivites', label: 'Collectivités', icone: '🏛️' },
@@ -81,6 +83,10 @@ function Interface({ role, email, userId }: { role: Role; email: string; userId:
   const aller = (p: Page) => { window.location.hash = p; window.scrollTo(0, 0) }
   const visibles = PAGES.filter((p) => !p.admin || role === 'admin')
   const p = visibles.some((x) => x.id === page) ? page : 'tableau'
+  const [nouvelles, setNouvelles] = useState(0)
+  useEffect(() => {
+    void supabase.from('demandes').select('id', { count: 'exact', head: true }).eq('statut', 'nouvelle').then(({ count }) => setNouvelles(count ?? 0))
+  }, [page])
 
   return (
     <div className="ges">
@@ -88,7 +94,7 @@ function Interface({ role, email, userId }: { role: Role; email: string; userId:
         <a href="/" className="ges-logo" aria-label="Retour au site"><img src="/assets/logo.png" alt="Les Toqués du Cœur" /></a>
         <nav aria-label="Gestion">
           {visibles.map((x) => (
-            <a key={x.id} href={'#' + x.id} aria-current={p === x.id ? 'page' : undefined}><span aria-hidden="true">{x.icone}</span>{x.label}</a>
+            <a key={x.id} href={'#' + x.id} aria-current={p === x.id ? 'page' : undefined}><span aria-hidden="true">{x.icone}</span>{x.label}{x.id === 'demandes' && nouvelles > 0 && <b className="ges-count" aria-label={`${nouvelles} nouvelles`}>{nouvelles}</b>}</a>
           ))}
         </nav>
         <div className="ges-me">
@@ -100,6 +106,7 @@ function Interface({ role, email, userId }: { role: Role; email: string; userId:
       </aside>
       <main className="ges-main">
         {p === 'tableau' && <Tableau role={role} aller={aller} />}
+        {p === 'demandes' && <Demandes role={role} />}
         {p === 'adherents' && <Adherents role={role} />}
         {p === 'distributions' && <Distributions role={role} />}
         {p === 'collectivites' && <Collectivites role={role} />}

@@ -7,6 +7,9 @@ const FICHE = 'https://drive.google.com/file/d/1PcrtDJr3N4-zxwTk8ZckMq1g6i3U-E1y
 const EMAIL = 'lestoquesducoeur@gmail.com'
 const TEL = '06 45 84 22 15'
 const ADHESION = 15
+// Même projet Supabase que les espaces (clé publiable, les règles RLS n'autorisent que le dépôt).
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL ?? 'https://gevmfeqxdrfcgdwsplyz.supabase.co'
+const SUPABASE_KEY = import.meta.env.VITE_SUPABASE_KEY ?? 'sb_publishable_8mqD6ooogCfXlBrGX_anQg_n_1mTjmZ'
 const PANIER = 5
 
 const delay = (ms: number) => ({ '--d': `${ms}ms` }) as CSSProperties
@@ -214,10 +217,19 @@ function Adhesion() {
     const form = e.currentTarget
     const data = new FormData(form)
     data.set('form-name', 'adhesion')
+    if (data.get('bot-field')) { setState('ok'); form.reset(); return }
     setState('sending')
+    const champ = (k: string) => String(data.get(k) ?? '').trim() || null
     try {
-      const res = await fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data as unknown as Record<string, string>).toString() })
+      // La demande est enregistrée dans la base, pour apparaître dans l'espace gestion.
+      const res = await fetch(`${SUPABASE_URL}/rest/v1/demandes`, {
+        method: 'POST',
+        headers: { apikey: SUPABASE_KEY, Authorization: `Bearer ${SUPABASE_KEY}`, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
+        body: JSON.stringify({ prenom: champ('prenom'), nom: champ('nom'), email: champ('email'), telephone: champ('telephone'), ville: champ('ville'), souhait: champ('souhait'), message: champ('message') }),
+      })
       if (!res.ok) throw new Error(String(res.status))
+      // Copie Netlify Forms, pour la notification par e-mail (sans bloquer si elle échoue).
+      void fetch('/', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: new URLSearchParams(data as unknown as Record<string, string>).toString() }).catch(() => {})
       setState('ok')
       form.reset()
     } catch {

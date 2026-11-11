@@ -158,3 +158,4 @@
   .ges-main{padding:18px 16px 60px}
   .hide-s{display:none}
 }
+.ges-count{margin-left:auto;min-width:22px;padding:1px 7px;border-radius:999px;background:var(--rose-deep);color:#fff;font-size:12px;font-weight:800;text-align:center}
