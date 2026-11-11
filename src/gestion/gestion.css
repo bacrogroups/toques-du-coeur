@@ -159,3 +159,4 @@
   .hide-s{display:none}
 }
 .ges-count{margin-left:auto;min-width:22px;padding:1px 7px;border-radius:999px;background:var(--rose-deep);color:#fff;font-size:12px;font-weight:800;text-align:center}
+.ges-mini.danger{background:var(--rose-soft);color:var(--rose-deep);box-shadow:none}

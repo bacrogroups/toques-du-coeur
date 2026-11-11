@@ -3,6 +3,8 @@ import { aujourdhui, dateCourte, dateLongue, message, supabase, type Evenement, 
 import { etatAdhesion, finDansUnAn, LIBELLE_ETAT, numero, recherche, telechargerCsv, type EtatAdhesion, type Role } from './outils'
 
 type Filtre = 'tous' | EtatAdhesion
+type Acces = Record<string, 'admin' | 'benevole'>
+const LIBELLE_ROLE = { admin: 'Bureau', benevole: 'Bénévole' } as const
 type Resa = { id: string; statut: string; evenements: { jour: string } }
 
 export default function Adherents({ role }: { role: Role }) {
@@ -12,10 +14,15 @@ export default function Adherents({ role }: { role: Role }) {
   const [ouvert, setOuvert] = useState<Foyer | null>(null)
   const [creation, setCreation] = useState(false)
   const [erreur, setErreur] = useState('')
+  const [acces, setAcces] = useState<Acces>({})
 
   const charger = useCallback(async () => {
-    const { data, error } = await supabase.from('foyers').select('*').order('nom').order('prenom')
+    const [{ data, error }, { data: eq }] = await Promise.all([
+      supabase.from('foyers').select('*').order('nom').order('prenom'),
+      supabase.rpc('equipe'),
+    ])
     if (error) setErreur(message(error))
+    setAcces(Object.fromEntries(((eq ?? []) as { user_id: string; role: 'admin' | 'benevole' }[]).map((m) => [m.user_id, m.role])))
     const list = (data ?? []) as Foyer[]
     setFoyers(list)
     setOuvert((o) => (o ? list.find((f) => f.id === o.id) ?? null : null))
@@ -74,7 +81,7 @@ export default function Adherents({ role }: { role: Role }) {
                 return (
                   <tr key={f.id} onClick={() => setOuvert(f)} tabIndex={0} onKeyDown={(e) => e.key === 'Enter' && setOuvert(f)}>
                     <td className="num">{String(f.numero).padStart(4, '0')}</td>
-                    <td><b>{f.prenom} {f.nom}</b>{!f.user_id && <small className="ges-muted"> · sans compte</small>}</td>
+                    <td><b>{f.prenom} {f.nom}</b>{!f.user_id && <small className="ges-muted"> · sans compte</small>}{f.user_id && acces[f.user_id] && <small className="ges-muted"> · {LIBELLE_ROLE[acces[f.user_id]]}</small>}</td>
                     <td className="hide-s">{f.telephone ?? f.email ?? '—'}</td>
                     <td className="hide-s">{f.nb_personnes} pers. · {f.ville ?? '—'}</td>
                     <td><span className={'ges-tag ' + etat}>{LIBELLE_ETAT[etat]}</span>{f.adhesion_fin && etat !== 'attente' && <small className="ges-muted"> {dateCourte(f.adhesion_fin)}</small>}</td>
@@ -86,13 +93,13 @@ export default function Adherents({ role }: { role: Role }) {
         </div>
       )}
 
-      {ouvert && <Fiche foyer={ouvert} role={role} onClose={() => setOuvert(null)} onChange={charger} />}
+      {ouvert && <Fiche foyer={ouvert} role={role} acces={ouvert.user_id ? acces[ouvert.user_id] : undefined} onClose={() => setOuvert(null)} onChange={charger} />}
       {creation && <NouveauFoyer onClose={() => setCreation(false)} onCreated={charger} />}
     </>
   )
 }
 
-function Fiche({ foyer: f, role, onClose, onChange }: { foyer: Foyer; role: Role; onClose: () => void; onChange: () => Promise<void> }) {
+function Fiche({ foyer: f, role, acces, onClose, onChange }: { foyer: Foyer; role: Role; acces?: 'admin' | 'benevole'; onClose: () => void; onChange: () => Promise<void> }) {
   const [resas, setResas] = useState<Resa[]>([])
   const [dates, setDates] = useState<Evenement[]>([])
   const [evt, setEvt] = useState('')
@@ -129,6 +136,33 @@ function Fiche({ foyer: f, role, onClose, onChange }: { foyer: Foyer; role: Role
   const renouveler = () => {
     const enCours = !!f.adhesion_fin && f.adhesion_fin >= aujourdhui()
     void adhesion({ statut: 'actif', adhesion_fin: enCours ? plusUnAn(f.adhesion_fin!) : finDansUnAn(aujourdhui()) }, 'Adhésion renouvelée pour un an.')
+  }
+
+  // Accès à la gestion : bénévole ou bureau, directement depuis la fiche.
+  async function donnerAcces(nouveau: 'admin' | 'benevole' | null) {
+    if (!f.user_id || !f.email) return
+    const qui = `${f.prenom} ${f.nom}`
+    const question = nouveau === null ? `Retirer l'accès à la gestion pour ${qui} ?`
+      : nouveau === 'admin' ? `Passer ${qui} au bureau ? Il ou elle aura tous les droits (valider les adhésions, messages, équipe, suppression).`
+      : `Donner à ${qui} l'accès bénévole à la gestion ?`
+    if (!window.confirm(question)) return
+    setOccupe(true); setMsg(null)
+    const { error } = nouveau === null
+      ? await supabase.rpc('retirer_membre', { membre: f.user_id })
+      : await supabase.rpc('ajouter_membre', { email: f.email, role: nouveau, nom: f.prenom })
+    setMsg(error ? { ok: false, texte: message(error) } : { ok: true, texte: nouveau === null ? 'Accès à la gestion retiré.' : `${f.prenom} est maintenant ${nouveau === 'admin' ? 'au bureau' : 'bénévole'}.` })
+    await onChange(); setOccupe(false)
+  }
+
+  async function supprimer() {
+    const qui = `${f.prenom} ${f.nom}`
+    if (!window.confirm(`Supprimer définitivement ${qui} (${numero(f)}) ?\n\nSa carte, ses réservations de paniers et ses demandes de location seront effacées${f.user_id ? ', ainsi que son compte en ligne' : ''}. Cette action ne peut pas être annulée.`)) return
+    setOccupe(true); setMsg(null)
+    const { error } = await supabase.rpc('supprimer_foyer', { foyer: f.id })
+    setOccupe(false)
+    if (error) { setMsg({ ok: false, texte: message(error) }); return }
+    onClose()
+    await onChange()
   }
 
   async function reserver() {
@@ -172,6 +206,18 @@ function Fiche({ foyer: f, role, onClose, onChange }: { foyer: Foyer; role: Role
 
         {role === 'admin' && f.user_id && <MotDePasse foyer={f} />}
 
+        {role === 'admin' && f.user_id && (
+          <>
+            <h3>Accès à la gestion</h3>
+            <p className="esp-small">{acces ? <>Actuellement : <b>{LIBELLE_ROLE[acces]}</b>.</> : 'Aucun accès pour l\'instant.'}</p>
+            <div className="ges-row wrap">
+              {acces !== 'benevole' && <button className="ges-mini" disabled={occupe} onClick={() => donnerAcces('benevole')}>{acces ? 'Passer bénévole' : 'Donner l\'accès bénévole'}</button>}
+              {acces !== 'admin' && <button className="ges-mini" disabled={occupe} onClick={() => donnerAcces('admin')}>Passer au bureau</button>}
+              {acces && <button className="ges-mini" disabled={occupe} onClick={() => donnerAcces(null)}>Retirer l'accès</button>}
+            </div>
+          </>
+        )}
+
         <h3>Réserver un panier pour ce foyer</h3>
         {dates.length === 0 ? <p className="esp-small">Aucune distribution à venir.</p> : (
           <div className="ges-row">
@@ -196,6 +242,14 @@ function Fiche({ foyer: f, role, onClose, onChange }: { foyer: Foyer; role: Role
               </li>
             ))}
           </ul>
+        )}
+
+        {role === 'admin' && (
+          <>
+            <h3>Supprimer</h3>
+            <p className="esp-small">Efface définitivement ce foyer{f.user_id ? ' et son compte en ligne' : ''}, avec ses réservations. À réserver aux doublons et aux demandes de suppression.</p>
+            <button className="ges-mini danger" disabled={occupe} onClick={supprimer}>Supprimer cet adhérent</button>
+          </>
         )}
       </aside>
     </div>
